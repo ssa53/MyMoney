@@ -322,4 +322,5 @@ darkModeToggle.addEventListener('change', () => {
         applyDarkMode(false);
         localStorage.setItem('darkMode', 'disabled');
     }
+
 });
