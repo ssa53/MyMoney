@@ -59,7 +59,10 @@ const port = 3000;
 app.use(session({
     secret: 'mysecretkey',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24,
+        secure: true}
 }));
 
 app.use(express.json()); // 서버가 JSON 데이터를 이해하도록 설정
