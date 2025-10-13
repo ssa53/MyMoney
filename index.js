@@ -106,7 +106,7 @@ app.get('/auth/kakao', (req, res) => {
 app.get('/auth/kakao/callback', async (req, res) => {
     const code = req.query.code;
     const CLIENT_ID = '1af73730f80155338187b3b3669482d4';
-    const REDIRECT_URI = 'http://localhost:3000/auth/kakao/callback';
+    const REDIRECT_URI = 'https://my-money-gamma.vercel.app/auth/kakao/callback';
     
     try {
         const tokenResponse = await axios({
@@ -229,4 +229,5 @@ app.delete('/api/data', async (req, res) => {
 // 서버 실행
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
+
 });
