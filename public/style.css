@@ -1,0 +1,511 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #cfcfcf;
+    color: #000000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 기존 center에서 flex-start로 변경 */
+    padding: 20px;
+}
+
+.app-container {
+    display: flex; /* Flexbox를 사용해 사이드바와 메인 콘텐츠를 나란히 배치 */
+    width: 100%;
+    min-height: 100vh; /* 최소 높이를 화면 전체로 설정 */
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar {
+    width: 250px;
+    padding: 20px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 사용자 정보창 스타일 */
+.user-info {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: #e2e2e7;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.user-info p {
+    margin-top: 0;
+    font-weight: bold;
+}
+
+#login-button {
+    background-color: #FEE500;
+    color: #000000;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#logout-link {
+    color: #5c67f2;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* 다크 모드 스타일 추가 */
+body.dark-mode .user-info {
+    background-color: #33333d;
+}
+
+body.dark-mode .user-info p {
+    color: #f0f0f0;
+}
+
+.menu-list {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item {
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.menu-item:hover {
+    background-color: #e2e2e7;
+}
+
+.main-content {
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+h1{
+    display: none;
+}
+
+h2 {
+    color: #4a4a4a;
+}
+
+
+
+#clear-data-btn:hover {
+    background-color: #c0392b;
+}
+
+#clear-data-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+#asset-list p {
+    margin: 5px 0;
+}
+
+.summary-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* 오른쪽으로 정렬 */
+    width: 100%;
+    text-align: right;
+}
+
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* 오른쪽으로 정렬 */
+    width: 100%;
+    text-align: right;
+}
+
+
+.summary,
+.input-form,
+.history,
+.stats-block,
+.settings-block {
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 효과 추가 */
+    margin: 0 auto 20px auto;
+    max-width: 900px;
+    width: 100%;
+}
+
+.editable-amount {
+    text-decoration: underline; /* 밑줄 추가 */
+    cursor: pointer; /* 마우스를 올리면 손가락 모양으로 변경 */
+    transition: background-color 0.2s ease; /* 부드러운 전환 효과 */
+    border-radius: 4px; /* 모서리 둥글게 */
+}
+
+.editable-amount:hover {
+    background-color: #f0f0f5;
+}
+
+
+#transaction-form {
+    display: flex;
+    justify-content: center; /* 폼 내부 요소들을 가운데로 정렬 */
+    align-items: center;
+    gap: 10px;
+}
+
+#transaction-form input, #transaction-form select, #transaction-form button {
+    padding: 7px;
+    border: 1px solid #a25555;
+    border-radius: 4px;
+}
+
+#transaction-form button {
+    background-color: #7f83bd;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#transaction-form button:hover {
+    background-color: #515ad4;
+}
+
+#transaction-list {
+    list-style: none;
+    padding: 0;
+}
+
+.transaction-description {
+    font-weight: normal; /* 글씨체를 일반체로 설정 */
+    color: #444;
+}
+
+#transaction-list li > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#transaction-list li {
+    background-color: #f8f8f8;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: grid;
+    /* 날짜, 내역+카테고리, 금액, 버튼에 대한 열 너비 지정 */
+    grid-template-columns: 1fr 2fr 1fr 40px; 
+    gap: 10px;
+    align-items: center;
+    box-shadow: none;
+}
+
+.transaction-amount-container {
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    width: 60px; /* 버튼의 너비를 고정 */
+    height: 30px; /* 버튼의 높이를 고정 */
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+.income {
+    border-left: 5px solid #28a745;
+}
+
+.expense {
+    border-left: 5px solid #dc3545;
+}
+
+.date-group-header {
+    background-color: #e2e2e2;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #555;
+    user-select: none;
+    
+    /* Flexbox를 사용해 날짜와 지출액을 양쪽 끝으로 정렬 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.daily-expense {
+    font-size: 0.9em;
+    font-weight: normal;
+    color: #000000; /* 지출액은 빨간색으로 강조 */
+}
+
+.category-label {
+    font-weight: bold; /* 글씨체를 볼드체로 설정 */
+    color: #777;
+    font-size: 0.8em;
+    margin-left: 0; /* 기존 마진 제거 */
+}
+
+.transaction-amount {
+    font-weight: bold;
+    text-align: right; /* 금액을 오른쪽 정렬 */
+    padding-left: 10px; /* 왼쪽 패딩으로 내역과 분리 */
+}
+
+/* 날짜별 그룹 목록 스타일 */
+.transaction-group-body {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.hidden-page {
+    display: none;
+}
+
+.statistics-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 20px;
+    flex-wrap: wrap; /* 화면이 좁아지면 줄바꿈 */
+}
+
+
+
+.stats-block ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+.stats-block li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.stats-block h3 {
+    margin-top: 0;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+/* 환경설정 페이지 디자인 */
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+/* 토글 스위치 스타일 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #5c67f2;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 28px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* 다크 모드 스타일 */
+body.dark-mode,
+body.dark-mode .app-container {
+    background-color: #121212;
+}
+
+body.dark-mode, 
+body.dark-mode .app-container,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode li {
+    color: #f0f0f0;
+}
+
+body.dark-mode {
+    background-color: #121212;
+    color: #f0f0f0;
+}
+
+body.dark-mode .summary,
+body.dark-mode .input-form,
+body.dark-mode .history,
+body.dark-mode .stats-block,
+body.dark-mode .settings-block,
+body.dark-mode .sidebar {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .date-group-header {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+}
+
+body.dark-mode #transaction-list li {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode .category-label {
+    color: #bbb;
+}
+
+body.dark-mode .editable-amount:hover {
+    background-color: #2c2c2c;
+}
+
+/* 로그인 페이지 스타일 */
+body.login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f4f9;
+    font-family: Arial, sans-serif;
+}
+
+.login-container {
+    text-align: center;
+    padding: 40px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h1 {
+    color: #333;
+}
+
+.kakao-login-btn {
+    background-color: #FEE500;
+    color: #000000;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.kakao-login-btn:hover {
+    background-color: #F8D900;
+}
