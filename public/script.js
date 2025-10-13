@@ -115,6 +115,7 @@ async function loadAllData() {
         transactions = [];
         assets = [];
     }
+
     updateAllUI();
 }
 
@@ -313,3 +314,4 @@ darkModeToggle.addEventListener('change', () => {
         localStorage.setItem('darkMode', 'disabled');
     }
 });
+
