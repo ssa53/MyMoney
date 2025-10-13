@@ -21,12 +21,10 @@ const dailyListEl = document.getElementById('daily-list');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 const userInfo = document.getElementById('user-info');
 
-
 let transactions = [];
 let assets = [];
-let currentUser = null; // 현재 로그인한 사용자 정보를 저장할 변수
+let currentUser = null;
 
-// 모든 데이터를 화면에 보여주는 단일 함수
 function updateAllUI() {
     listEl.innerHTML = '';
     assetListEl.innerHTML = '';
@@ -96,7 +94,6 @@ function updateAllUI() {
     balanceEl.innerText = totalBalance.toLocaleString();
 }
 
-// 페이지 로드 시 모든 데이터 불러오기
 async function loadAllData() {
     try {
         const userResponse = await axios.get('/user');
@@ -105,29 +102,24 @@ async function loadAllData() {
             <p>안녕하세요, ${currentUser.nickname}님!</p>
             <a href="/logout" id="logout-link">로그아웃</a>
         `;
-        // 로그인 성공 시 서버에서 사용자 데이터 불러오기
         const transactionResponse = await axios.get(`/api/transactions?userId=${currentUser.kakaoId}`);
         const assetResponse = await axios.get(`/api/assets?userId=${currentUser.kakaoId}`);
         transactions = transactionResponse.data;
         assets = assetResponse.data;
 
     } catch (error) {
-        // 로그인하지 않았을 때 (서버에서 401 응답을 보낼 경우)
         userInfo.innerHTML = `
             <p>로그인이 필요합니다.</p>
             <a href="/auth/kakao" id="login-link">카카오톡으로 로그인</a>
         `;
-        // 로그인 상태가 아니므로 데이터는 비어있음
         transactions = [];
         assets = [];
     }
-
     updateAllUI();
 }
 
 loadAllData();
 
-// 통계 데이터를 계산하고 화면에 보여주는 함수
 function updateStatisticsUI() {
     yearlyListEl.innerHTML = '';
     monthlyListEl.innerHTML = '';
@@ -171,7 +163,6 @@ assetListEl.addEventListener('input', async (event) => {
     const assetToUpdate = assets.find(a => a.name === assetName);
     if (assetToUpdate) {
         assetToUpdate.amount = newAmount;
-        // 서버에 업데이트 요청
         await axios.put(`/api/assets/${assetToUpdate._id}`, { amount: newAmount });
         updateAllUI();
     }
@@ -275,7 +266,6 @@ assetListEl.addEventListener('input', async (event) => {
         const assetToUpdate = assets.find(a => a.name === assetName);
         if (assetToUpdate) {
             assetToUpdate.amount = newAmount;
-            // 서버에 업데이트 요청
             await axios.put(`/api/assets/${assetToUpdate._id}`, { amount: newAmount });
             updateAllUI();
         }
@@ -322,5 +312,4 @@ darkModeToggle.addEventListener('change', () => {
         applyDarkMode(false);
         localStorage.setItem('darkMode', 'disabled');
     }
-
 });
