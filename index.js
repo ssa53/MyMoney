@@ -60,9 +60,6 @@ app.use(session({
     secret: 'mysecretkey',
     resave: false,
     saveUninitialized: true
-    maxAge: 1000 * 60 * 60 * 24,
-    secure: true, // HTTPS 환경에서만 쿠키 전송
-    sameSite: 'none' // 다른 도메인에서도 쿠키를 사용할 수 있도록 설정
 }));
 
 app.use(express.json()); // 서버가 JSON 데이터를 이해하도록 설정
@@ -234,5 +231,6 @@ app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 
 });
+
 
 
