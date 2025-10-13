@@ -98,7 +98,7 @@ app.get('/logout', (req, res) => {
 // =========================================================
 app.get('/auth/kakao', (req, res) => {
     const CLIENT_ID = '1af73730f80155338187b3b3669482d4';
-    const REDIRECT_URI = 'http://localhost:3000/auth/kakao/callback';
+    const REDIRECT_URI = 'https://my-money-gamma.vercel.app/auth/kakao/callback';
     const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     res.redirect(KAKAO_AUTH_URL);
 });
@@ -231,3 +231,4 @@ app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 
 });
+
