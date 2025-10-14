@@ -227,7 +227,6 @@ async function loadAllData() {
         assets = assetResponse.data;
         document.querySelector('.menu-item[data-page="asset-management-page"]').click();
     } catch (error) {
-        // 이 catch 블록은 로그인된 사용자의 세션이 만료되었을 때만 실행됩니다.
         console.error("세션 만료 또는 사용자 정보 로드 실패. 로그아웃합니다.", error);
         window.location.href = '/logout';
     } finally {
@@ -244,8 +243,7 @@ function initialize() {
             applyDarkMode(true);
         }
     }
-    // 로그인 페이지가 아니라고 확신할 수 있을 때만 데이터 로딩
-    if (document.querySelector('.app-container')) {
+    if (document.querySelector('.app-container')) { // 메인 앱 페이지일 때만 데이터 로드
         loadAllData();
     }
 }
