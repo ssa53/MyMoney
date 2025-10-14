@@ -4,7 +4,6 @@
 const userInfo = document.getElementById('user-info');
 const loadingSpinner = document.getElementById('loading-spinner');
 const menuItems = document.querySelectorAll('.menu-item');
-
 const assetManagementPage = document.getElementById('asset-management-page');
 const koreanBalanceEl = document.getElementById('total-balance-korean');
 const chartContainer = document.querySelector('.chart-container');
@@ -21,16 +20,13 @@ const categoryEl = document.getElementById('beomju-input');
 const typeEl = document.getElementById('type');
 const transactionEmptyState = document.getElementById('transaction-empty-state');
 const listEl = document.getElementById('transaction-list');
-
 const editAssetsBtn = document.getElementById('edit-assets-btn');
 const assetEditModal = document.getElementById('asset-edit-modal');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const modalAssetList = document.getElementById('modal-asset-list');
-
 const statisticsPage = document.getElementById('statistics-page');
 const statsTabs = document.querySelector('.stats-tabs');
 const categoryExpenseChartCanvas = document.getElementById('category-expense-chart');
-
 const transactionHistoryPage = document.getElementById('transaction-history-page');
 const prevMonthBtn = document.getElementById('prev-month-btn');
 const nextMonthBtn = document.getElementById('next-month-btn');
@@ -39,7 +35,6 @@ const calendarGrid = document.getElementById('calendar-grid');
 const calendarDetails = document.getElementById('calendar-details');
 const detailsTitle = document.getElementById('details-title');
 const detailsTransactionList = document.getElementById('details-transaction-list');
-
 const settingsPage = document.getElementById('settings-page');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 const clearDataBtn = document.getElementById('clear-data-btn');
@@ -57,7 +52,6 @@ let displayedMonth = new Date();
 // ==================================
 // 3. 핵심 기능 함수 (Rendering & Logic)
 // ==================================
-
 function renderTransactionList(targetTransactions, targetListEl) {
     if (!targetListEl) return;
     targetListEl.innerHTML = '';
@@ -67,11 +61,7 @@ function renderTransactionList(targetTransactions, targetListEl) {
         return;
     } 
     
-    const grouped = targetTransactions.reduce((groups, t) => {
-        (groups[t.date] = groups[t.date] || []).push(t);
-        return groups;
-    }, {});
-
+    const grouped = targetTransactions.reduce((groups, t) => { (groups[t.date] = groups[t.date] || []).push(t); return groups; }, {});
     Object.keys(grouped).sort((a,b) => b.localeCompare(a)).forEach(date => {
         const dailyTotal = grouped[date].reduce((total, t) => t.type === 'expense' ? total - t.amount : total + t.amount, 0);
         let dailyStatus = '';
@@ -172,8 +162,8 @@ function renderStatistics(period) {
     document.querySelectorAll('.stats-tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.period === period));
     const now = new Date();
     let currentPeriodStart, previousPeriodStart, previousPeriodEnd;
-    if (period === 'weekly') { const sunday = new Date(); sunday.setDate(now.getDate() - now.getDay()); currentPeriodStart = sunday; previousPeriodStart = new Date(new Date().setDate(sunday.getDate() - 7)); previousPeriodEnd = new Date(new Date().setDate(now.getDate() - 7)); } 
-    else if (period === 'monthly') { currentPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1); previousPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); previousPeriodEnd = new Date(new Date().setMonth(now.getMonth() - 1)); } 
+    if (period === 'weekly') { const sunday = new Date(now); sunday.setDate(now.getDate() - now.getDay()); currentPeriodStart = sunday; previousPeriodStart = new Date(sunday); previousPeriodStart.setDate(sunday.getDate() - 7); previousPeriodEnd = new Date(now); previousPeriodEnd.setDate(now.getDate() - 7); } 
+    else if (period === 'monthly') { currentPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1); previousPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); previousPeriodEnd = new Date(now); previousPeriodEnd.setMonth(now.getMonth() - 1); } 
     else { currentPeriodStart = new Date(now.getFullYear(), 0, 1); }
     const currentTransactions = transactions.filter(t => new Date(t.date) >= currentPeriodStart);
     let previousTransactions = []; if (period !== 'yearly') { previousTransactions = transactions.filter(t => new Date(t.date) >= previousPeriodStart && new Date(t.date) <= previousPeriodEnd); }

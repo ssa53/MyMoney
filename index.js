@@ -1,29 +1,18 @@
-// 필요한 모듈 불러오기
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const axios = require('axios');
 const session = require('express-session');
-const dbConnect = require('./lib/dbConnect');
 const MongoStore = require('connect-mongo');
 const nocache = require('nocache');
 
-// MongoDB 사용자 스키마 정의
+// --- 스키마 정의 ---
 const userSchema = new mongoose.Schema({
-    kakaoId: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    nickname: {
-        type: String,
-        required: true
-    },
+    kakaoId: { type: String, required: true, unique: true },
+    nickname: { type: String, required: true },
 });
-
 const User = mongoose.model('User', userSchema);
 
-// 거래 내역 스키마 정의
 const transactionSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     date: { type: String, required: true },
@@ -32,69 +21,43 @@ const transactionSchema = new mongoose.Schema({
     category: { type: String, required: true },
     type: { type: String, required: true }
 });
-
 const Transaction = mongoose.model('Transaction', transactionSchema);
 
-// 자산 스키마 정의
 const assetSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     name: { type: String, required: true },
     amount: { type: Number, required: true }
 });
-
 const Asset = mongoose.model('Asset', assetSchema);
 
-// MongoDB Connection String (여러분이 입력한 값)
-const uri = "mongodb+srv://sodoso532:Wognsdl12.@my-money-cluster.cg81boi.mongodb.net/?retryWrites=true&w=majority&appName=my-money-cluster"
+// --- MongoDB 연결 ---
+const uri = process.env.MONGODB_URI;
+mongoose.connect(uri)
+    .then(() => console.log('Connected to MongoDB Atlas!'))
+    .catch(err => console.error('Could not connect to MongoDB Atlas...', err));
 
-// express 앱 생성 및 설정
+// --- Express 앱 설정 ---
 const app = express();
-const port = 3000;
 app.set('trust proxy', 1);
+
+// --- 미들웨어 설정 ---
 app.use(nocache());
-// =========================================================
-// 미들웨어 설정
-// =========================================================
-app.use(async (req, res, next) => {
-  try {
-    await dbConnect();
-    next();
-  } catch (error) {
-    console.error('Database connection error:', error);
-    res.status(503).send('Service Unavailable');
-  }
-});
-
 app.use(session({
-  secret: process.env.SECRET_COOKIE_PASSWORD,
-  resave: false, // 세션이 변경되지 않으면 다시 저장하지 않음 (권장)
-  saveUninitialized: false, // 로그인한 사용자에게만 세션을 생성 (권장)
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI // 세션을 저장할 MongoDB 연결 주소
-  }),
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 동안 로그인 유지
-    secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 HTTPS에서만 쿠키 전송
-  }
-}));
-
-app.use(express.json()); // 서버가 JSON 데이터를 이해하도록 설정
-app.use(express.static(path.join(__dirname, 'public')));
-
-// =========================================================
-// 1. 프론트엔드 파일 제공 및 로그인 상태 확인
-// =========================================================
-app.get('/', (req, res) => {
-    // 세션이 유효한지 다시 한번 명확하게 확인합니다.
-    if (req.session && req.session.user) {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    } else {
-        res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    secret: process.env.SECRET_COOKIE_PASSWORD,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: uri }),
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        secure: true,
+        httpOnly: true,
     }
-});
+}));
+app.use(express.json());
 
+// --- API 라우트 ---
 app.get('/user', (req, res) => {
-    if (req.session.user) {
+    if (req.session && req.session.user) {
         res.json(req.session.user);
     } else {
         res.status(401).json({ error: 'Unauthorized' });
@@ -110,81 +73,57 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// =========================================================
-// 2. 카카오 로그인 API
-// =========================================================
 app.get('/auth/kakao', (req, res) => {
-    const CLIENT_ID = '1af73730f80155338187b3b3669482d4';
-    const REDIRECT_URI = 'https://my-money-gamma.vercel.app/auth/kakao/callback';
+    const CLIENT_ID = process.env.KAKAO_CLIENT_ID;
+    const REDIRECT_URI = process.env.KAKAO_REDIRECT_URI;
     const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     res.redirect(KAKAO_AUTH_URL);
 });
 
 app.get('/auth/kakao/callback', async (req, res) => {
-    const code = req.query.code;
-    const CLIENT_ID = '1af73730f80155338187b3b3669482d4';
-    const REDIRECT_URI = 'https://my-money-gamma.vercel.app/auth/kakao/callback';
+    const { code } = req.query;
+    const CLIENT_ID = process.env.KAKAO_CLIENT_ID;
+    const REDIRECT_URI = process.env.KAKAO_REDIRECT_URI;
 
-    if (!code) {
-        return res.redirect('/');
-    }
+    if (!code) return res.redirect('/');
     
     try {
-        const tokenResponse = await axios({
-            method: 'POST',
-            url: 'https://kauth.kakao.com/oauth/token',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
-            data: new URLSearchParams({
-                grant_type: 'authorization_code',
-                client_id: CLIENT_ID,
-                redirect_uri: REDIRECT_URI,
-                code: code
-            })
-        });
+        const tokenResponse = await axios.post('https://kauth.kakao.com/oauth/token', new URLSearchParams({
+            grant_type: 'authorization_code',
+            client_id: CLIENT_ID,
+            redirect_uri: REDIRECT_URI,
+            code: code,
+        }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' } });
 
-        const accessToken = tokenResponse.data.access_token;
+        const { access_token } = tokenResponse.data;
 
-        const userResponse = await axios({
-            method: 'GET',
-            url: 'https://kapi.kakao.com/v2/user/me',
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-            }
+        const userResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
+            headers: { Authorization: `Bearer ${access_token}` },
         });
 
         const kakaoUser = userResponse.data;
-
         let user = await User.findOne({ kakaoId: kakaoUser.id });
 
         if (!user) {
             user = new User({
-                kakaoId: kakaoUser.id,
+                kakaoId: kakaoUser.id.toString(),
                 nickname: kakaoUser.properties.nickname,
             });
             await user.save();
         }
-
         req.session.user = user;
-        
         res.redirect('/');
-
     } catch (error) {
         console.error('카카오 로그인 오류:', error.response?.data || error.message);
         res.status(500).send('카카오 로그인 중 오류가 발생했습니다.');
     }
 });
 
-
-// =========================================================
-// 3. 데이터 저장/불러오기/삭제 API
-// =========================================================
 app.get('/api/transactions', async (req, res) => {
-    if (!req.session.user) {
+    if (!req.session.user || req.query.userId !== req.session.user.kakaoId) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const userId = req.session.user.kakaoId;
-    const transactions = await Transaction.find({ userId: userId });
+    const transactions = await Transaction.find({ userId: req.session.user.kakaoId });
     res.json(transactions);
 });
 
@@ -192,59 +131,37 @@ app.post('/api/transactions', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const userId = req.session.user.kakaoId;
-    const newTransaction = new Transaction({ ...req.body, userId: userId });
+    const newTransaction = new Transaction({ ...req.body, userId: req.session.user.kakaoId });
     await newTransaction.save();
-    res.json(newTransaction);
+    res.status(201).json(newTransaction);
+});
+
+app.put('/api/transactions/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const updated = await Transaction.findOneAndUpdate(
+        { _id: req.params.id, userId: req.session.user.kakaoId },
+        { $set: req.body },
+        { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
 });
 
 app.delete('/api/transactions/:id', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const userId = req.session.user.kakaoId;
-    const transactionId = req.params.id;
-    await Transaction.deleteOne({ _id: transactionId, userId: userId });
-    res.status(200).json({ message: 'Transaction deleted.' });
-});
-
-// ★★★ 자산 금액 수정을 위한 API (PUT 메서드) ★★★
-app.put('/api/assets/:id', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.kakaoId;
-    const assetId = req.params.id;
-    const { amount } = req.body; // 프론트에서 보낸 새로운 금액
-
-    // amount가 숫자가 아니거나 음수이면 에러 처리
-    if (typeof amount !== 'number' || amount < 0) {
-        return res.status(400).json({ error: 'Invalid amount' });
-    }
-
-    try {
-        const updatedAsset = await Asset.findOneAndUpdate(
-            { _id: assetId, userId: userId }, // 조건: 내 소유의 자산 id
-            { amount: amount }, // 변경할 내용
-            { new: true } // 변경된 결과를 반환
-        );
-
-        if (!updatedAsset) {
-            return res.status(404).json({ error: 'Asset not found' });
-        }
-        res.status(200).json(updatedAsset);
-    } catch (error) {
-        console.error('Error updating asset:', error);
-        res.status(500).json({ error: 'Server error while updating asset' });
-    }
+    await Transaction.deleteOne({ _id: req.params.id, userId: req.session.user.kakaoId });
+    res.status(200).json({ message: 'Deleted' });
 });
 
 app.get('/api/assets', async (req, res) => {
-    if (!req.session.user) {
+    if (!req.session.user || req.query.userId !== req.session.user.kakaoId) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const userId = req.session.user.kakaoId;
-    const assets = await Asset.find({ userId: userId });
+    const assets = await Asset.find({ userId: req.session.user.kakaoId });
     res.json(assets);
 });
 
@@ -252,43 +169,34 @@ app.post('/api/assets', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const userId = req.session.user.kakaoId;
-    const newAsset = new Asset({ ...req.body, userId: userId });
+    const newAsset = new Asset({ ...req.body, userId: req.session.user.kakaoId });
     await newAsset.save();
-    res.json(newAsset);
+    res.status(201).json(newAsset);
+});
+
+app.put('/api/assets/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { amount } = req.body;
+    if (typeof amount !== 'number' || amount < 0) {
+        return res.status(400).json({ error: 'Invalid amount' });
+    }
+    const updated = await Asset.findOneAndUpdate(
+        { _id: req.params.id, userId: req.session.user.kakaoId },
+        { amount },
+        { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
 });
 
 app.delete('/api/assets/:id', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const userId = req.session.user.kakaoId;
-    const assetId = req.params.id;
-    await Asset.deleteOne({ _id: assetId, userId: userId });
-    res.status(200).json({ message: 'Asset deleted.' });
-});
-
-app.put('/api/transactions/:id', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.kakaoId;
-    const transactionId = req.params.id;
-    
-    try {
-        const updatedTransaction = await Transaction.findOneAndUpdate(
-            { _id: transactionId, userId: userId }, // 조건
-            { $set: req.body }, // 업데이트할 내용 (예: { description: '새로운 내용' })
-            { new: true } // 업데이트된 문서를 반환
-        );
-        if (!updatedTransaction) {
-            return res.status(404).json({ error: 'Transaction not found' });
-        }
-        res.status(200).json(updatedTransaction);
-    } catch (error) {
-        console.error('Error updating transaction:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
+    await Asset.deleteOne({ _id: req.params.id, userId: req.session.user.kakaoId });
+    res.status(200).json({ message: 'Deleted' });
 });
 
 app.delete('/api/data', async (req, res) => {
@@ -296,13 +204,24 @@ app.delete('/api/data', async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     const userId = req.session.user.kakaoId;
-    await Transaction.deleteMany({ userId: userId });
-    await Asset.deleteMany({ userId: userId });
-    res.status(200).json({ message: 'All data deleted successfully.' });
+    await Transaction.deleteMany({ userId });
+    await Asset.deleteMany({ userId });
+    res.status(200).json({ message: 'All data deleted' });
+});
+
+// --- 페이지 라우팅 및 정적 파일 제공 ---
+app.get('/', (req, res) => {
+    if (req.session && req.session.user) {
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    } else {
+        res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    }
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('*', (req, res) => {
+    res.redirect('/');
 });
 
 module.exports = app;
-
-
-
-
