@@ -175,9 +175,9 @@ function applyDarkMode(isDark) {
 // 페이지 로드 시 모든 데이터를 불러오는 메인 함수
 async function loadAllData() {
     try {
-        const userResponse = await axios.get('/api/user');
+        const userResponse = await axios.get('/user'); // '/api/user' -> '/user'
         currentUser = userResponse.data;
-        userInfo.innerHTML = `<p>안녕하세요, ${currentUser.nickname}님!</p><a href="/api/logout" id="logout-link">로그아웃</a>`;
+        userInfo.innerHTML = `<p>안녕하세요, ${currentUser.nickname}님!</p><a href="/logout" id="logout-link">로그아웃</a>`; // '/api/logout' -> '/logout'
         
         updateUIVisibility(true);
 
@@ -189,7 +189,7 @@ async function loadAllData() {
         assets = assetResponse.data;
 
     } catch (error) {
-        userInfo.innerHTML = `<p>로그인이 필요합니다.</p><a href="/api/auth/kakao" class="kakao-login-btn">카카오톡으로 로그인</a>`;
+        userInfo.innerHTML = `<p>로그인이 필요합니다.</p><a href="/auth/kakao" class="kakao-login-btn">카카오톡으로 로그인</a>`; // '/api/auth/kakao' -> '/auth/kakao'
         updateUIVisibility(false);
         transactions = [];
         assets = [];
