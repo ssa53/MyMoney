@@ -301,7 +301,7 @@ body.dark-mode #transaction-form button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px; /* 상하 패딩을 줄여 높이를 낮춤 */
+    padding: 8px 15px; /* 상하 패딩을 줄여 높이를 낮춤 */
     margin-bottom: 8px;
     border: 1px solid #eee;
     border-radius: 8px;
@@ -314,8 +314,9 @@ body.dark-mode #transaction-form button:hover {
 
 #transaction-list li > div {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
 }
 
 .transaction-description {
