@@ -326,7 +326,7 @@ body.dark-mode #transaction-form button:hover {
 .category-label {
     color: #777;
     font-size: 0.85em;
-    margin-top: 4px;
+    margin-top: 0;
 }
 
 .transaction-amount-container {
