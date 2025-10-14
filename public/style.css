@@ -516,60 +516,88 @@ body.login-body {
 /* ================================== */
 
 @media (max-width: 768px) {
-    /* 전체 레이아웃을 세로로 배치 */
+
+    /* 1. 전체적인 레이아웃 변경 */
+    .app-container {
+        flex-direction: column; /* 사이드바와 메인 콘텐츠를 세로로 쌓음 */
+    }
+
     body {
-        /* body에 flex가 적용되어 있다면 */
-        flex-direction: column;
+        padding: 0; /* body의 여백을 제거하여 화면을 꽉 채움 */
     }
 
-    /* 좌측 메뉴 (사이드바) 스타일 변경 */
-    .sidebar { /* 실제 사이드바의 클래스 이름으로 변경하세요 */
-        width: 100%; /* 너비를 100%로 채움 */
-        height: auto; /* 높이는 자동으로 조절 */
-        display: flex; /* 내부 메뉴 아이템들을 가로로 배치 */
-        justify-content: space-around; /* 메뉴 아이템 간격 균등하게 */
-        padding: 10px 0;
-        border-right: none; /* 오른쪽 경계선 제거 */
-        border-bottom: 1px solid #333; /* 아래쪽 경계선 추가 */
+
+    /* 2. 사이드바를 상단 메뉴바처럼 변경 */
+    .sidebar {
+        width: 100%; /* 너비를 꽉 채움 */
+        height: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자를 아래로만 연하게 */
+        border-right: none;
+        padding: 10px;
     }
 
-    /* 메인 콘텐츠 영역 스타일 변경 */
-    .main-content { /* 실제 메인 콘텐츠 영역의 클래스 이름으로 변경하세요 */
-        width: 100%;
-        padding: 15px; /* 내부 여백 조정 */
+    .menu-list {
+        display: flex; /* 메뉴 아이템들을 가로로 배치 */
+        justify-content: space-around; /* 균등 분배 */
     }
 
-    /* 소득/지출 추가하기 폼 스타일 변경 */
-    #transaction-form {
-        flex-direction: column; /* 입력 필드들을 세로로 쌓음 */
-        gap: 10px; /* 각 입력 필드 사이의 간격 */
+    .menu-item {
+        padding: 10px 5px; /* 내부 여백 축소 */
     }
 
-    #transaction-form input,
-    #transaction-form select,
-    #transaction-form button {
-        width: 100%; /* 모든 입력 요소 너비를 100%로 */
+    .sidebar-header {
+        display: none; /* 'MENU' 텍스트 숨김 */
     }
-    
-    /* 자산 추가 폼도 세로로 변경 */
+
+
+    /* 3. 메인 콘텐츠 영역 조정 */
+    .main-content {
+        padding: 15px; /* 모바일 화면에 맞게 여백 조정 */
+    }
+
+
+    /* 4. 각종 폼 요소들을 세로로 쌓기 */
+    #transaction-form,
     #add-asset-form {
-        flex-direction: column;
+        flex-direction: column; /* 입력 필드를 세로로 쌓음 */
+        align-items: stretch; /* 항목들을 컨테이너 너비에 맞춤 */
         gap: 10px;
     }
     
+    #transaction-form input,
+    #transaction-form select,
+    #transaction-form button,
     #add-asset-form input,
     #add-asset-form button {
-        width: 100%;
+        width: 100%; /* 너비를 100%로 설정 */
+        box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
     }
 
-    /* 거래 내역 리스트 아이템 스타일 조정 */
-    .transaction-list li, .date-group-header {
-        flex-direction: column; /* 내용과 금액을 세로로 배치 */
+
+    /* 5. 거래 내역 리스트 레이아웃 변경 */
+    #transaction-list li {
+        display: flex; /* Grid 대신 Flexbox 사용 */
+        flex-direction: column; /* 세로로 쌓기 */
         align-items: flex-start; /* 왼쪽 정렬 */
-        gap: 5px;
+        gap: 8px; /* 항목 간 간격 */
     }
 
-    .transaction-list .transaction-amount {
-        font-size: 1.1em; /* 금액 글씨 크기 조정 */
+    /* 거래 내역 안의 금액과 삭제 버튼을 한 줄에 배치 */
+    .transaction-amount-container {
+        width: 100%;
+        display: flex;
+        justify-content: space-between; /* 양쪽 끝으로 배치 */
+        align-items: center;
+    }
+    
+    .transaction-amount {
+        padding-left: 0; /* 불필요한 패딩 제거 */
+        text-align: left;
+    }
+
+
+    /* 6. 통계 보기 페이지 레이아웃 변경 */
+    .statistics-container {
+        flex-direction: column; /* 통계 블록들을 세로로 쌓음 */
     }
 }
