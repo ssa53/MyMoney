@@ -7,6 +7,8 @@ const session = require('express-session');
 const dbConnect = require('./lib/dbConnect');
 const MongoStore = require('connect-mongo');
 
+app.set('trust proxy', 1);
+
 // MongoDB 사용자 스키마 정의
 const userSchema = new mongoose.Schema({
     kakaoId: {
