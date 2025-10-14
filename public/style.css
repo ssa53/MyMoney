@@ -177,6 +177,7 @@ h1, h2, h3 {
     outline: none;
     transition: all 0.2s ease-in-out;
     flex: 1;
+    min-width: 0;
 }
 
 /* 두 폼의 입력창 포커스(클릭) 시 공통 효과 */
