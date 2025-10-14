@@ -152,28 +152,12 @@ h1, h2, h3 {
 /* ================================== */
 /* 6. 폼 관련 스타일 (자산 추가, 소득/지출 추가) */
 /* ================================== */
-#add-asset-form {
-    display: flex;
-    gap: 10px;
-}
+/* ================================== */
+/* 6. 폼 관련 스타일 (자산 추가, 소득/지출 추가) */
+/* ================================== */
 
-#add-asset-form input {
-    flex-grow: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-}
-
-#add-asset-form button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 6px;
-    background-color: #5c67f2;
-    color: white;
-    cursor: pointer;
-}
-
-/* 소득/지출 추가 폼 (리디자인된 버전) */
+/* 두 폼의 공통 레이아웃 */
+#add-asset-form,
 #transaction-form {
     display: flex;
     gap: 15px;
@@ -181,6 +165,8 @@ h1, h2, h3 {
     width: 100%;
 }
 
+/* 두 폼의 모든 입력창(input, select) 공통 스타일 */
+#add-asset-form input,
 #transaction-form input,
 #transaction-form select {
     background-color: #f0f2f5;
@@ -194,6 +180,8 @@ h1, h2, h3 {
     flex: 1;
 }
 
+/* 두 폼의 입력창 포커스(클릭) 시 공통 효과 */
+#add-asset-form input:focus,
 #transaction-form input:focus,
 #transaction-form select:focus {
     border-color: #5c67f2;
@@ -201,10 +189,14 @@ h1, h2, h3 {
     box-shadow: 0 0 0 3px rgba(92, 103, 242, 0.2);
 }
 
+/* 두 폼의 플레이스홀더(안내 문구) 공통 스타일 */
+#add-asset-form input::placeholder,
 #transaction-form input::placeholder {
     color: #888;
 }
 
+/* 두 폼의 버튼 공통 스타일 */
+#add-asset-form button,
 #transaction-form button {
     background-color: #5c67f2;
     color: white;
@@ -214,11 +206,45 @@ h1, h2, h3 {
     padding: 8px 20px;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 버튼 크기가 줄어들지 않도록 설정 */
 }
 
+/* 두 폼의 버튼에 마우스 올렸을 때 공통 효과 */
+#add-asset-form button:hover,
 #transaction-form button:hover {
     background-color: #4a54c2;
+}
+
+/* ----- 다크 모드에서도 두 폼에 공통 적용 ----- */
+body.dark-mode #add-asset-form input,
+body.dark-mode #transaction-form input,
+body.dark-mode #transaction-form select {
+    background-color: #33333d;
+    border-color: transparent;
+    color: #f0f0f0;
+}
+
+body.dark-mode #add-asset-form input::placeholder,
+body.dark-mode #transaction-form input::placeholder {
+    color: #888;
+}
+
+body.dark-mode #add-asset-form input:focus,
+body.dark-mode #transaction-form input:focus,
+body.dark-mode #transaction-form select:focus {
+    border-color: #7a83f5;
+    background-color: #1e1e1e;
+    box-shadow: 0 0 0 3px rgba(122, 131, 245, 0.25);
+}
+
+body.dark-mode #add-asset-form button,
+body.dark-mode #transaction-form button {
+    background-color: #7a83f5;
+}
+
+body.dark-mode #add-asset-form button:hover,
+body.dark-mode #transaction-form button:hover {
+    background-color: #5c67f2;
 }
 
 /* ================================== */
