@@ -69,21 +69,23 @@
 
             <div id="statistics-page" style="display: none;">
                 <h2>통계 보기</h2>
-                <div class="stats-summary-container">
-                    <div class="stats-card" data-period="yearly">
-                        <h3>올해</h3>
-                        <p class="income-stat">수입: <span id="yearly-income">0원</span></p>
-                        <p class="expense-stat">지출: <span id="yearly-expense">0원</span></p>
+                <div class="stats-tabs">
+                    <button class="stats-tab-btn active" data-period="monthly">이번 달</button>
+                    <button class="stats-tab-btn" data-period="weekly">이번 주</button>
+                    <button class="stats-tab-btn" data-period="yearly">올해</button>
+                </div>
+
+                <div class="stats-content">
+                    <div class="stats-summary">
+                        <p class="income-stat">수입: <span id="stats-income">0원</span></p>
+                        <p class="expense-stat">지출: <span id="stats-expense">0원</span></p>
+                        <p class="comparison-stat" id="stats-comparison"></p>
                     </div>
-                    <div class="stats-card" data-period="monthly">
-                        <h3>이번 달</h3>
-                        <p class="income-stat">수입: <span id="monthly-income">0원</span></p>
-                        <p class="expense-stat">지출: <span id="monthly-expense">0원</span></p>
-                    </div>
-                    <div class="stats-card" data-period="weekly">
-                        <h3>이번 주</h3>
-                        <p class="income-stat">수입: <span id="weekly-income">0원</span></p>
-                        <p class="expense-stat">지출: <span id="weekly-expense">0원</span></p>
+                    <div class="stats-chart-container">
+                        <canvas id="category-expense-chart"></canvas>
+                        <div id="stats-empty-state" class="empty-state" style="display: none;">
+                            <p>해당 기간에 지출 내역이 없습니다.</p>
+                        </div>
                     </div>
                 </div>
 

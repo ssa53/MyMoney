@@ -819,90 +819,76 @@ body.dark-mode .empty-state p {
     color: #aaa;
 }
 
-/* --- 통계 페이지 스타일 --- */
-.stats-summary-container {
+/* --- 통계 페이지 리디자인 스타일 --- */
+.stats-tabs {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-.stats-card {
-    flex: 1;
-    min-width: 200px;
-    background-color: #f0f2f5;
-    padding: 20px;
-    border-radius: 12px;
+.stats-tab-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    background-color: transparent;
+    color: #888;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.2s ease;
 }
 
-.stats-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+.stats-tab-btn.active {
+    background-color: #5c67f2;
+    color: white;
+    border-color: #5c67f2;
 }
 
-.stats-card h3 {
-    margin-top: 0;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-}
-
-.stats-card p {
-    margin: 8px 0;
-    font-size: 1.1em;
-}
-
-.income-stat span {
-    color: #28a745;
-    font-weight: bold;
-}
-
-.expense-stat span {
-    color: #dc3545;
-    font-weight: bold;
-}
-
-.stats-details {
-    background-color: #f0f2f5;
+.stats-content {
+    background-color: #f9f9fb;
     padding: 25px;
     border-radius: 12px;
 }
 
-#stats-details-list {
-    list-style: none;
-    padding: 0;
+.stats-summary {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-#stats-details-list li {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid #ddd;
+.stats-summary p {
+    margin: 5px 0;
+    font-size: 1.2em;
 }
 
-#stats-back-btn {
-    margin-top: 20px;
-    /* 기존 버튼 스타일과 통일 */
-    background-color: #5c67f2;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 15px;
-    cursor: pointer;
+.comparison-stat {
+    font-size: 0.9em !important;
+    color: #777;
+}
+
+.stats-chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    height: 350px;
+    margin: 0 auto;
 }
 
 /* --- 다크 모드 통계 스타일 --- */
-body.dark-mode .stats-card,
-body.dark-mode .stats-details {
-    background-color: #2c2c2c;
+body.dark-mode .stats-tab-btn {
     border-color: #444;
+    color: #888;
 }
-body.dark-mode .stats-card h3,
-body.dark-mode #stats-details-list li {
-    border-color: #444;
-}
-body.dark-mode #stats-back-btn {
+
+body.dark-mode .stats-tab-btn.active {
     background-color: #7a83f5;
+    border-color: #7a83f5;
+    color: white;
+}
+
+body.dark-mode .stats-content {
+    background-color: #2c2c2c;
+}
+
+body.dark-mode .comparison-stat {
+    color: #aaa;
 }

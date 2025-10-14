@@ -39,6 +39,10 @@ const assetEmptyState = document.getElementById('asset-empty-state');
 const transactionEmptyState = document.getElementById('transaction-empty-state');
 const chartContainer = document.querySelector('.chart-container'); // 차트 컨테이너 변수 추가
 
+const statsTabs = document.querySelector('.stats-tabs');
+const categoryExpenseChartCanvas = document.getElementById('category-expense-chart');
+let categoryExpenseChart = null; // 차트 인스턴스를 저장할 변수
+
 // ==================================
 // 2. 상태(State) 변수 선언
 // ==================================
@@ -243,46 +247,124 @@ function updateAllUI() {
 
 
 // 통계 페이지 UI 업데이트
-function updateStatisticsUI() {
+function renderStatistics(period) {
+    // 탭 활성화 상태 업데이트
+    document.querySelectorAll('.stats-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.period === period);
+    });
+
     const now = new Date();
-    
-    // 1. 기간별 거래 내역 필터링
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    let currentPeriodStart, previousPeriodStart, previousPeriodEnd, title;
 
-    const weeklyTransactions = transactions.filter(t => new Date(t.date) >= startOfWeek);
-    const monthlyTransactions = transactions.filter(t => new Date(t.date) >= startOfMonth);
-    const yearlyTransactions = transactions.filter(t => new Date(t.date) >= startOfYear);
+    // 기간 설정
+    if (period === 'weekly') {
+        title = '이번 주';
+        currentPeriodStart = new Date(now);
+        currentPeriodStart.setDate(now.getDate() - now.getDay()); // 이번 주 일요일
+        previousPeriodStart = new Date(currentPeriodStart);
+        previousPeriodStart.setDate(currentPeriodStart.getDate() - 7); // 저번 주 일요일
+        previousPeriodEnd = new Date(now);
+        previousPeriodEnd.setDate(now.getDate() - 7); // 저번 주 오늘
+    } else if (period === 'monthly') {
+        title = '이번 달';
+        currentPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        previousPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        previousPeriodEnd = new Date(now);
+        previousPeriodEnd.setMonth(now.getMonth() - 1);
+    } else { // yearly
+        title = '올해';
+        currentPeriodStart = new Date(now.getFullYear(), 0, 1);
+    }
 
-    // 2. 총 수입/지출 계산 헬퍼 함수
-    const calculateTotals = (arr) => {
-        return arr.reduce((totals, t) => {
-            if (t.type === 'income') {
-                totals.income += t.amount;
+    // 데이터 필터링
+    const currentTransactions = transactions.filter(t => new Date(t.date) >= currentPeriodStart);
+    let previousTransactions = [];
+    if (period === 'weekly' || period === 'monthly') {
+        previousTransactions = transactions.filter(t => {
+            const tDate = new Date(t.date);
+            return tDate >= previousPeriodStart && tDate <= previousPeriodEnd;
+        });
+    }
+
+    // 수입/지출 계산
+    const currentTotals = currentTransactions.reduce((acc, t) => {
+        acc[t.type] = (acc[t.type] || 0) + t.amount;
+        return acc;
+    }, { income: 0, expense: 0 });
+
+    const previousExpenseTotal = previousTransactions.reduce((sum, t) => t.type === 'expense' ? sum + t.amount : sum, 0);
+
+    // 요약 정보 UI 업데이트
+    document.getElementById('stats-income').innerText = currentTotals.income.toLocaleString() + '원';
+    document.getElementById('stats-expense').innerText = currentTotals.expense.toLocaleString() + '원';
+
+    // 지난 기간과 비교 UI 업데이트
+    const comparisonEl = document.getElementById('stats-comparison');
+    if (period === 'weekly' || period === 'monthly') {
+        const diff = currentTotals.expense - previousExpenseTotal;
+        const periodText = period === 'weekly' ? '지난 주' : '지난 달';
+        if (previousExpenseTotal === 0 && currentTotals.expense > 0) {
+            comparisonEl.innerHTML = `${periodText} 대비 지출이 발생했습니다.`;
+            comparisonEl.style.color = '#dc3545';
+        } else if (previousExpenseTotal > 0) {
+            const percentage = Math.round((diff / previousExpenseTotal) * 100);
+            if (diff > 0) {
+                comparisonEl.innerHTML = `${periodText} 대비 <strong>+${diff.toLocaleString()}원</strong> (↑${percentage}%) 더 사용했어요.`;
+                comparisonEl.style.color = '#dc3545';
             } else {
-                totals.expense += t.amount;
+                comparisonEl.innerHTML = `${periodText} 대비 <strong>${(-diff).toLocaleString()}원</strong> (↓${-percentage}%) 아꼈어요!`;
+                comparisonEl.style.color = '#28a745';
             }
-            return totals;
-        }, { income: 0, expense: 0 });
-    };
+        } else {
+            comparisonEl.innerHTML = `지난 기간에 지출이 없었어요.`;
+            comparisonEl.style.color = '#777';
+        }
+    } else {
+        comparisonEl.innerHTML = ''; // '올해'는 비교 숨김
+    }
 
-    // 3. 각 카드에 데이터 업데이트
-    const yearlyTotals = calculateTotals(yearlyTransactions);
-    document.getElementById('yearly-income').innerText = yearlyTotals.income.toLocaleString() + '원';
-    document.getElementById('yearly-expense').innerText = yearlyTotals.expense.toLocaleString() + '원';
+    // 차트 데이터 가공 및 그리기
+    const expensesByCategory = currentTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((acc, t) => {
+            acc[t.category] = (acc[t.category] || 0) + t.amount;
+            return acc;
+        }, {});
 
-    const monthlyTotals = calculateTotals(monthlyTransactions);
-    document.getElementById('monthly-income').innerText = monthlyTotals.income.toLocaleString() + '원';
-    document.getElementById('monthly-expense').innerText = monthlyTotals.expense.toLocaleString() + '원';
+    const statsEmptyState = document.getElementById('stats-empty-state');
+    if (Object.keys(expensesByCategory).length === 0) {
+        statsEmptyState.style.display = 'block';
+        if (categoryExpenseChart) categoryExpenseChart.destroy();
+        categoryExpenseChartCanvas.style.display = 'none';
+    } else {
+        statsEmptyState.style.display = 'none';
+        categoryExpenseChartCanvas.style.display = 'block';
 
-    const weeklyTotals = calculateTotals(weeklyTransactions);
-    document.getElementById('weekly-income').innerText = weeklyTotals.income.toLocaleString() + '원';
-    document.getElementById('weekly-expense').innerText = weeklyTotals.expense.toLocaleString() + '원';
+        const sortedCategories = Object.entries(expensesByCategory).sort(([, a], [, b]) => b - a);
+        const labels = sortedCategories.map(item => item[0]);
+        const data = sortedCategories.map(item => item[1]);
 
-    // 4. 상세 보기 숨기고, 요약 보기 보여주기 (초기 상태)
-    document.querySelector('.stats-summary-container').style.display = 'flex';
-    document.getElementById('stats-details-container').style.display = 'none';
+        if (categoryExpenseChart) {
+            categoryExpenseChart.destroy();
+        }
+        categoryExpenseChart = new Chart(categoryExpenseChartCanvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FFCD56'],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                }
+            }
+        });
+    }
 }
 
 // 다크 모드 적용/해제
@@ -342,60 +424,11 @@ function initialize() {
 // 5. 이벤트 리스너(Event Listeners) - 한 곳으로 모아서 재배치
 // ==================================
 
-if (statisticsPage) {
-    statisticsPage.addEventListener('click', (event) => {
-        const card = event.target.closest('.stats-card');
-        const backBtn = event.target.closest('#stats-back-btn');
-
-        if (card) {
-            const period = card.dataset.period;
-            let title = '';
-            let targetTransactions = [];
-
-            const now = new Date();
-            if (period === 'yearly') {
-                title = `${now.getFullYear()}년 카테고리별 지출`;
-                const startOfYear = new Date(now.getFullYear(), 0, 1);
-                targetTransactions = transactions.filter(t => new Date(t.date) >= startOfYear && t.type === 'expense');
-            } else if (period === 'monthly') {
-                title = `${now.getMonth() + 1}월 카테고리별 지출`;
-                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                targetTransactions = transactions.filter(t => new Date(t.date) >= startOfMonth && t.type === 'expense');
-            } else if (period === 'weekly') {
-                title = `이번 주 카테고리별 지출`;
-                const startOfWeek = new Date(new Date().setDate(new Date().getDate() - new Date().getDay()));
-                targetTransactions = transactions.filter(t => new Date(t.date) >= startOfWeek && t.type === 'expense');
-            }
-
-            const expensesByCategory = targetTransactions.reduce((map, t) => {
-                map[t.category] = (map[t.category] || 0) + t.amount;
-                return map;
-            }, {});
-
-            const detailsList = document.getElementById('stats-details-list');
-            detailsList.innerHTML = ''; // 목록 초기화
-
-            // 금액순으로 정렬
-            const sortedCategories = Object.entries(expensesByCategory).sort(([, a], [, b]) => b - a);
-            
-            if (sortedCategories.length === 0) {
-                 detailsList.innerHTML = '<li>해당 기간에 지출 내역이 없습니다.</li>';
-            } else {
-                sortedCategories.forEach(([category, amount]) => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span>${category}</span> <strong>${amount.toLocaleString()}원</strong>`;
-                    detailsList.appendChild(li);
-                });
-            }
-
-            document.getElementById('stats-details-title').innerText = title;
-            document.querySelector('.stats-summary-container').style.display = 'none';
-            document.getElementById('stats-details-container').style.display = 'block';
-        }
-
-        if (backBtn) {
-            document.querySelector('.stats-summary-container').style.display = 'flex';
-            document.getElementById('stats-details-container').style.display = 'none';
+if (statsTabs) {
+    statsTabs.addEventListener('click', (event) => {
+        if (event.target.tagName === 'BUTTON') {
+            const period = event.target.dataset.period;
+            renderStatistics(period);
         }
     });
 }
@@ -417,7 +450,7 @@ function setupEventListeners() {
                 }
 
                 if (pageId === 'statistics-page') {
-                    updateStatisticsUI();
+                    renderStatistics('monthly');
                 }
             });
         });
