@@ -43,7 +43,6 @@
                         <button type="submit">자산 추가</button>
                     </form>
                 </div>
-
                 <div class="input-form">
                     <h2>소득 / 지출 추가하기</h2>
                     <form id="transaction-form">
@@ -58,7 +57,6 @@
                         <button type="submit">추가</button>
                     </form>
                 </div>
-
                 <div class="history">
                     <h2>거래 내역 (최근 7일)</h2>
                     <div id="transaction-empty-state" class="empty-state" style="display: none;">
@@ -92,22 +90,18 @@
 
             <div id="transaction-history-page" style="display: none;">
                 <h2>지출 내역</h2>
-                
                 <div class="month-navigator">
                     <button id="prev-month-btn" class="button-secondary">&lt;</button>
                     <h3 id="current-month-display"></h3>
                     <button id="next-month-btn" class="button-secondary">&gt;</button>
                 </div>
-
                 <div class="calendar-container">
                     <div class="calendar-header">
                         <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
                     </div>
-                    <div id="calendar-grid" class="calendar-grid">
-                        </div>
+                    <div id="calendar-grid" class="calendar-grid"></div>
                 </div>
-
-                <div id="calendar-details" style="display: none;">
+                <div id="calendar-details" class="history" style="display: none; margin-top: 20px;">
                     <h3 id="details-title"></h3>
                     <ul id="details-transaction-list" class="transaction-list-full"></ul>
                 </div>

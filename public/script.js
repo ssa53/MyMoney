@@ -368,7 +368,7 @@ function setupEventListeners() {
                 const date = dayCell.dataset.date;
                 const dailyTransactions = transactions.filter(t => t.date === date);
                 detailsTitle.textContent = `${date} 상세 내역`;
-                renderTransactionList(dailyTransactions, detailsTransactionList, "해당 날짜에 거래 내역이 없습니다.");
+                renderTransactionList(dailyTransactions, detailsTransactionList);
                 calendarDetails.style.display = 'block';
             }
         });
@@ -486,7 +486,6 @@ function setupEventListeners() {
         });
     }
 }
-
 
 // ==================================
 // 6. 앱 시작
