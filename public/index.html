@@ -92,21 +92,13 @@
 
             <div id="transaction-history-page" style="display: none;">
                 <h2>지출 내역</h2>
-                <div class="filter-controls">
-                    <select id="history-period-select">
-                        <option value="all">전체</option>
-                        <option value="yearly">년별</option>
-                        <option value="monthly" selected>월별</option>
-                        <option value="weekly">주별</option>
-                        <option value="daily">일별</option>
-                    </select>
-                    <input type="date" id="history-date-input" style="display: none;">
-                    <button id="history-filter-btn">조회</button>
+                <div class="month-navigator">
+                    <button id="prev-month-btn">&lt;</button>
+                    <h3 id="current-month-display"></h3>
+                    <button id="next-month-btn">&gt;</button>
                 </div>
-                <div id="filtered-transaction-empty-state" class="empty-state" style="display: none;">
-                    <p>해당 기간에 거래 내역이 없습니다.</p>
-                </div>
-                <ul id="filtered-transaction-list" class="transaction-list-full"></ul>
+                <div id="history-details-container">
+                    </div>
             </div>
 
             <div id="settings-page" style="display: none;">
