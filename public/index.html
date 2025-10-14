@@ -9,6 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <div id="loading-spinner" class="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
     <div class="app-container">
         <div class="sidebar">
             <div class="sidebar-header">MENU</div>
@@ -26,6 +29,9 @@
                     <h2>자산 현황</h2>
                     <div id="total-balance-korean" class="total-balance-display"></div>
                     <div class="chart-container">
+                    <div id="asset-empty-state" class="empty-state" style="display: none">
+                        <p>첫 자산을 추가하여 자산 관리를 시작해보세요!</p>
+                    </div>
                         <canvas id="assetChart"></canvas>
                         <div id="asset-list-details" class="asset-list-popup"></div>
                     </div>
@@ -54,6 +60,9 @@
 
                 <div class="history">
                     <h2>거래 내역</h2>
+                    <div id="transaction-empty-state" class="empty-state" style="display: none;">
+                        <p>첫 거래 내역을 추가해보세요!</p>
+                    </div>
                     <ul id="transaction-list"></ul>
                 </div>
             </div>

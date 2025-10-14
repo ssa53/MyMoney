@@ -33,6 +33,12 @@ const assetEditModal = document.getElementById('asset-edit-modal');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const modalAssetList = document.getElementById('modal-asset-list');
 
+const loadingSpinner = document.getElementById('loading-spinner');
+
+const assetEmptyState = document.getElementById('asset-empty-state');
+const transactionEmptyState = document.getElementById('transaction-empty-state');
+const chartContainer = document.querySelector('.chart-container'); // 차트 컨테이너 변수 추가
+
 // ==================================
 // 2. 상태(State) 변수 선언
 // ==================================
@@ -151,63 +157,82 @@ function updateUIVisibility(isLoggedIn) {
 
 // 모든 UI를 다시 그리는 함수
 function updateAllUI() {
-    if (!listEl) return;
-    listEl.innerHTML = '';
-    
-    // ★★★ 기존 자산 목록 그리던 코드 삭제됨 ★★★
+    // ★★★ 1. 자산 목록 빈 상태 처리 ★★★
+    // 자산이 하나도 없으면 안내 문구를 보여주고, 있으면 차트를 보여줍니다.
+    if (assets.length === 0) {
+        if (chartContainer) chartContainer.style.display = 'none';
+        if (assetEmptyState) assetEmptyState.style.display = 'block';
+    } else {
+        if (chartContainer) chartContainer.style.display = 'block';
+        if (assetEmptyState) assetEmptyState.style.display = 'none';
+        renderAssetChart(); // 자산이 있을 때만 차트를 그립니다.
+    }
 
-    const groupedTransactions = transactions.reduce((groups, t) => {
-        if (!groups[t.date]) groups[t.date] = [];
-        groups[t.date].push(t);
-        return groups;
-    }, {});
-
-    const sortedDates = Object.keys(groupedTransactions).sort((a, b) => b.localeCompare(a));
-    sortedDates.forEach(date => {
-        // ... (거래 내역 리스트 그리는 로직은 기존과 거의 동일)
-        const dailyTotal = groupedTransactions[date].reduce((total, t) => t.type === 'expense' ? total - t.amount : total + t.amount, 0);
-        let dailyStatus = '';
-        if (dailyTotal > 0) dailyStatus = `수입: ${dailyTotal.toLocaleString()}원`;
-        else if (dailyTotal < 0) dailyStatus = `지출: ${(-dailyTotal).toLocaleString()}원`;
-
-        const groupHeader = document.createElement('div');
-        groupHeader.classList.add('date-group-header');
-        groupHeader.innerHTML = `<span>${date}</span><span class="daily-expense">${dailyStatus}</span>`;
-        listEl.appendChild(groupHeader);
+    // ★★★ 2. 거래 내역 빈 상태 처리 ★★★
+    // 거래 내역이 하나도 없으면 안내 문구를 보여주고, 있으면 목록을 보여줍니다.
+    if (transactions.length === 0) {
+        if (listEl) listEl.innerHTML = ''; // 목록을 깨끗하게 비웁니다.
+        if (listEl) listEl.style.display = 'none';
+        if (transactionEmptyState) transactionEmptyState.style.display = 'block';
+    } else {
+        if (listEl) listEl.style.display = 'block';
+        if (transactionEmptyState) transactionEmptyState.style.display = 'none';
         
-        const groupBody = document.createElement('ul');
-        groupBody.classList.add('transaction-group-body');
-        groupBody.style.display = 'none';
+        // --- 거래 내역 목록 그리기 시작 ---
+        listEl.innerHTML = ''; // 목록을 새로 그리기 전에 초기화합니다.
+        
+        const groupedTransactions = transactions.reduce((groups, t) => {
+            if (!groups[t.date]) groups[t.date] = [];
+            groups[t.date].push(t);
+            return groups;
+        }, {});
 
-        groupedTransactions[date].forEach(transaction => {
-            const listItem = document.createElement('li');
-            listItem.classList.add(transaction.type);
-            listItem.setAttribute('data-id', transaction._id);
-            listItem.innerHTML = `
-                <div>
-                    <span class="transaction-description editable" data-field="description">${transaction.description}</span>
-                    <span class="category-label editable" data-field="category">${transaction.category}</span>
-                </div>
-                <div class="transaction-amount-container">
-                    <span class="transaction-amount editable" data-field="amount">${transaction.amount.toLocaleString()}</span>
-                    <span style="color: ${transaction.type === 'expense' ? '#dc3545' : '#28a745'}; font-weight: bold;">원</span>
-                    <button class="delete-btn">삭제</button>
-                </div>
-            `;
-            groupBody.appendChild(listItem);
+        const sortedDates = Object.keys(groupedTransactions).sort((a, b) => b.localeCompare(a));
+
+        sortedDates.forEach(date => {
+            const dailyTotal = groupedTransactions[date].reduce((total, t) => t.type === 'expense' ? total - t.amount : total + t.amount, 0);
+            let dailyStatus = '';
+            if (dailyTotal > 0) dailyStatus = `수입: ${dailyTotal.toLocaleString()}원`;
+            else if (dailyTotal < 0) dailyStatus = `지출: ${(-dailyTotal).toLocaleString()}원`;
+
+            const groupHeader = document.createElement('div');
+            groupHeader.classList.add('date-group-header');
+            groupHeader.innerHTML = `<span>${date}</span><span class="daily-expense">${dailyStatus}</span>`;
+            listEl.appendChild(groupHeader);
+            
+            const groupBody = document.createElement('ul');
+            groupBody.classList.add('transaction-group-body');
+            groupBody.style.display = 'none';
+
+            groupedTransactions[date].forEach(transaction => {
+                const listItem = document.createElement('li');
+                listItem.classList.add(transaction.type);
+                listItem.setAttribute('data-id', transaction._id);
+                listItem.innerHTML = `
+                    <div>
+                        <span class="transaction-description editable" data-field="description">${transaction.description}</span>
+                        <span class="category-label editable" data-field="category">${transaction.category}</span>
+                    </div>
+                    <div class="transaction-amount-container">
+                        <span class="transaction-amount editable" data-field="amount">${transaction.amount.toLocaleString()}</span>
+                        <span style="color: ${transaction.type === 'expense' ? '#dc3545' : '#28a745'}; font-weight: bold;">원</span>
+                        <button class="delete-btn">삭제</button>
+                    </div>
+                `;
+                groupBody.appendChild(listItem);
+            });
+            listEl.appendChild(groupBody);
         });
-        listEl.appendChild(groupBody);
-    });
+        // --- 거래 내역 목록 그리기 끝 ---
+    }
 
-    // ★★★ 총 자산 계산 로직 변경: 초기 자산의 합계만 표시 ★★★
+    // 3. 총 자산 (한글 포맷) 계산 및 표시
+    // 이 부분은 데이터 유무와 상관없이 항상 계산되어야 합니다. (0원 표시)
     const finalBalance = assets.reduce((sum, asset) => sum + asset.amount, 0);
     const koreanBalanceEl = document.getElementById('total-balance-korean');
     if (koreanBalanceEl) {
         koreanBalanceEl.innerHTML = formatToKoreanWon(finalBalance);
     }
-    
-    // ★★★ 자산 현황 원형 그래프 그리기 함수 호출 추가 ★★★
-    renderAssetChart();
 }
 
 
@@ -228,6 +253,7 @@ function applyDarkMode(isDark) {
 // 페이지 로드 시 모든 데이터를 불러오는 메인 함수
 async function loadAllData() {
     if (!userInfo) return;
+    loadingSpinner.style.display = 'flex';
     try {
         const userResponse = await axios.get('/user');
         currentUser = userResponse.data;
@@ -250,6 +276,9 @@ async function loadAllData() {
         transactions = [];
         assets = [];
         updateAllUI(); // 로그아웃 상태의 빈 UI를 그려줌
+    }
+    finally{
+        loadingSpinner.style.display = 'none';
     }
 }
 
@@ -325,6 +354,7 @@ function setupEventListeners() {
             // 거래 내역 그룹 토글 로직
             const header = event.target.closest('.date-group-header');
             if (header) {
+                header.classList.toggle('is-open');
                 const groupBody = header.nextElementSibling;
                 if (groupBody) groupBody.style.display = groupBody.style.display === 'none' ? 'block' : 'none';
                 return;
