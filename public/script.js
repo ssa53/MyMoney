@@ -434,27 +434,35 @@ if (statsTabs) {
 }
 
 function setupEventListeners() {
-    if (menuItems) {
-        menuItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const pageId = item.getAttribute('data-page');
-                if (!pageId || !currentUser) return;
+        if (menuItems) {
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const pageId = item.getAttribute('data-page');
+                    if (!pageId) return;
 
-                [assetManagementPage, statisticsPage, settingsPage].forEach(page => page.style.display = 'none');
-                menuItems.forEach(menu => menu.classList.remove('active'));
-                
-                const pageToShow = document.getElementById(pageId);
-                if (pageToShow) {
-                    pageToShow.style.display = 'block';
-                    item.classList.add('active');
-                }
+                    // 1. 먼저 모든 페이지를 숨기고 메뉴 활성화 상태를 제거합니다.
+                    [assetManagementPage, statisticsPage, settingsPage].forEach(page => {
+                        if (page) page.style.display = 'none';
+                    });
+                    menuItems.forEach(menu => menu.classList.remove('active'));
+                    
+                    // 2. 클릭한 메뉴에 해당하는 페이지만 화면에 보여줍니다.
+                    const pageToShow = document.getElementById(pageId);
+                    if (pageToShow) {
+                        pageToShow.style.display = 'block';
+                        item.classList.add('active');
+                    }
 
-                if (pageId === 'statistics-page') {
-                    renderStatistics('monthly');
-                }
+                    // 3. 만약 '통계 보기' 탭을 클릭했다면, 차트를 그리는 함수를 호출합니다.
+                    if (pageId === 'statistics-page') {
+                        // 로그인 상태일 때만 통계 데이터를 렌더링
+                        if (currentUser) {
+                            renderStatistics('monthly');
+                        }
+                    }
+                });
             });
-        });
-    }
+        }
 
     if (formEl) {
         formEl.addEventListener('submit', async (event) => {
