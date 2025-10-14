@@ -328,7 +328,7 @@ body.dark-mode #transaction-form button:hover {
 .date-group-header::after {
     content: '▶'; /* 아이콘 문자 */
     position: absolute;
-    right: 15px;
+    left: 10px;
     font-size: 0.8em;
     transition: transform 0.2s ease-in-out;
 }
