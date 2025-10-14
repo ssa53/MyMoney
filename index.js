@@ -6,6 +6,7 @@ const axios = require('axios');
 const session = require('express-session');
 const dbConnect = require('./lib/dbConnect');
 const MongoStore = require('connect-mongo');
+const nocache = require('nocache');
 
 // MongoDB 사용자 스키마 정의
 const userSchema = new mongoose.Schema({
@@ -50,7 +51,7 @@ const uri = "mongodb+srv://sodoso532:Wognsdl12.@my-money-cluster.cg81boi.mongodb
 const app = express();
 const port = 3000;
 app.set('trust proxy', 1);
-
+app.use(nocache());
 // =========================================================
 // 미들웨어 설정
 // =========================================================
@@ -84,7 +85,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 1. 프론트엔드 파일 제공 및 로그인 상태 확인
 // =========================================================
 app.get('/', (req, res) => {
-    if (req.session.user) {
+    // 세션이 유효한지 다시 한번 명확하게 확인합니다.
+    if (req.session && req.session.user) {
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
     } else {
         res.sendFile(path.join(__dirname, 'public', 'login.html'));
