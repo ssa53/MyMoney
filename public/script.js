@@ -1,12 +1,10 @@
 // ==================================
 // 1. 요소(Element) 변수 선언
 // ==================================
-// 공통 요소
 const userInfo = document.getElementById('user-info');
 const loadingSpinner = document.getElementById('loading-spinner');
 const menuItems = document.querySelectorAll('.menu-item');
 
-// 자산 관리 페이지 요소
 const assetManagementPage = document.getElementById('asset-management-page');
 const koreanBalanceEl = document.getElementById('total-balance-korean');
 const chartContainer = document.querySelector('.chart-container');
@@ -24,25 +22,22 @@ const typeEl = document.getElementById('type');
 const transactionEmptyState = document.getElementById('transaction-empty-state');
 const listEl = document.getElementById('transaction-list');
 
-// 자산 수정 팝업 요소
 const editAssetsBtn = document.getElementById('edit-assets-btn');
 const assetEditModal = document.getElementById('asset-edit-modal');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const modalAssetList = document.getElementById('modal-asset-list');
 
-// 통계 보기 페이지 요소
 const statisticsPage = document.getElementById('statistics-page');
 const statsTabs = document.querySelector('.stats-tabs');
 const categoryExpenseChartCanvas = document.getElementById('category-expense-chart');
 
-// 지출 내역 페이지 요소
 const transactionHistoryPage = document.getElementById('transaction-history-page');
-const prevMonthBtn = document.getElementById('prev-month-btn');
-const nextMonthBtn = document.getElementById('next-month-btn');
-const currentMonthDisplay = document.getElementById('current-month-display');
-const historyDetailsContainer = document.getElementById('history-details-container');
+const historyPeriodSelect = document.getElementById('history-period-select');
+const historyDateInput = document.getElementById('history-date-input');
+const historyFilterBtn = document.getElementById('history-filter-btn');
+const filteredTransactionList = document.getElementById('filtered-transaction-list');
+const filteredTransactionEmptyState = document.getElementById('filtered-transaction-empty-state');
 
-// 환경설정 페이지 요소
 const settingsPage = document.getElementById('settings-page');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 const clearDataBtn = document.getElementById('clear-data-btn');
@@ -55,17 +50,24 @@ let assets = [];
 let currentUser = null;
 let assetChart = null;
 let categoryExpenseChart = null;
-let displayedMonth = new Date(); // 지출 내역 페이지의 현재 표시 월
-
+let displayedMonth = new Date();
 
 // ==================================
 // 3. 핵심 기능 함수 (Rendering & Logic)
 // ==================================
 
-// --- 거래 내역 리스트 렌더링 함수 (재사용) ---
-function renderTransactionList(targetTransactions, targetListEl) {
+function renderTransactionList(targetTransactions, targetListEl, targetEmptyStateEl) {
     if (!targetListEl) return;
     targetListEl.innerHTML = '';
+
+    if (!targetTransactions || targetTransactions.length === 0) {
+        targetListEl.style.display = 'none';
+        if (targetEmptyStateEl) targetEmptyStateEl.style.display = 'block';
+        return;
+    } 
+    
+    targetListEl.style.display = 'block';
+    if (targetEmptyStateEl) targetEmptyStateEl.style.display = 'none';
     
     const grouped = targetTransactions.reduce((groups, t) => {
         (groups[t.date] = groups[t.date] || []).push(t);
@@ -80,7 +82,12 @@ function renderTransactionList(targetTransactions, targetListEl) {
 
         const groupHeader = document.createElement('div');
         groupHeader.classList.add('date-group-header');
-        groupHeader.innerHTML = `<div class="date-header-left"><span class="toggle-icon"></span><span>${date}</span></div><span class="daily-expense">${dailyStatus}</span>`;
+        groupHeader.innerHTML = `
+            <div class="date-header-left">
+                <span class="toggle-icon"></span>
+                <span>${date}</span>
+            </div>
+            <span class="daily-expense">${dailyStatus}</span>`;
         targetListEl.appendChild(groupHeader);
         
         const groupBody = document.createElement('ul');
@@ -107,7 +114,6 @@ function renderTransactionList(targetTransactions, targetListEl) {
     });
 }
 
-// --- 자산 관리 페이지 관련 함수 ---
 function updateAllUI() {
     if (assets.length === 0) {
         if (chartContainer) chartContainer.style.display = 'none';
@@ -125,17 +131,7 @@ function updateAllUI() {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(new Date().getDate() - 7);
     const recentTransactions = transactions.filter(t => new Date(t.date) >= oneWeekAgo);
-    
-    if (listEl) {
-        if (recentTransactions.length === 0) {
-            listEl.style.display = 'none';
-            if (transactionEmptyState) transactionEmptyState.style.display = 'block';
-        } else {
-            listEl.style.display = 'block';
-            if (transactionEmptyState) transactionEmptyState.style.display = 'none';
-            renderTransactionList(recentTransactions, listEl);
-        }
-    }
+    renderTransactionList(recentTransactions, listEl, transactionEmptyState);
 }
 
 function renderAssetChart() {
@@ -143,11 +139,23 @@ function renderAssetChart() {
     const ctx = assetChartCanvas.getContext('2d');
     if (assetChart) assetChart.destroy();
     assetChart = new Chart(ctx, {
-        type: 'doughnut', data: {
+        type: 'doughnut',
+        data: {
             labels: assets.map(a => a.name),
             datasets: [{ data: assets.map(a => a.amount), backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'] }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: (c) => `${c.label}: ${c.parsed.toLocaleString()}원` }}}}
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        label: (c) => `${c.label}: ${c.parsed.toLocaleString()}원`
+                    }
+                }
+            }
+        }
     });
 }
 
@@ -159,7 +167,10 @@ function formatToKoreanWon(number) {
         const part = number % 10000;
         if (part > 0) {
             let pStr = '', h = Math.floor(part / 1000), t = Math.floor((part % 1000) / 100), d = Math.floor((part % 100) / 10), o = part % 10;
-            if (h > 0) pStr += `<span>${h}</span>천 `; if (t > 0) pStr += `<span>${t}</span>백 `; if (d > 0) pStr += `<span>${d}</span>십 `; if (o > 0) pStr += `<span>${o}</span>`;
+            if (h > 0) pStr += `<span>${h}</span>천 `;
+            if (t > 0) pStr += `<span>${t}</span>백 `;
+            if (d > 0) pStr += `<span>${d}</span>십 `;
+            if (o > 0) pStr += `<span>${o}</span>`;
             result = `${pStr.trim()} ${units[unitIndex]} ${result}`;
         }
         number = Math.floor(number / 10000);
@@ -168,13 +179,12 @@ function formatToKoreanWon(number) {
     return result.trim() + ` <span class="won-unit">원</span>`;
 }
 
-// --- 통계 페이지 관련 함수 ---
 function renderStatistics(period) { 
     if (!statisticsPage) return;
     document.querySelectorAll('.stats-tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.period === period));
     const now = new Date();
     let currentPeriodStart, previousPeriodStart, previousPeriodEnd;
-    if (period === 'weekly') { currentPeriodStart = new Date(now.setDate(now.getDate() - now.getDay())); previousPeriodStart = new Date(new Date().setDate(currentPeriodStart.getDate() - 7)); previousPeriodEnd = new Date(new Date().setDate(now.getDate() - 7)); } 
+    if (period === 'weekly') { const sunday = new Date(); sunday.setDate(now.getDate() - now.getDay()); currentPeriodStart = sunday; previousPeriodStart = new Date(new Date().setDate(sunday.getDate() - 7)); previousPeriodEnd = new Date(new Date().setDate(now.getDate() - 7)); } 
     else if (period === 'monthly') { currentPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1); previousPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); previousPeriodEnd = new Date(new Date().setMonth(now.getMonth() - 1)); } 
     else { currentPeriodStart = new Date(now.getFullYear(), 0, 1); }
     const currentTransactions = transactions.filter(t => new Date(t.date) >= currentPeriodStart);
@@ -200,43 +210,19 @@ function renderStatistics(period) {
     }
 }
 
-// --- 지출 내역 페이지 관련 함수 ---
-function renderHistoryPage(dateToShow) {
+function filterAndRenderHistory() {
     if (!transactionHistoryPage) return;
-    currentMonthDisplay.textContent = `${dateToShow.getFullYear()}년 ${dateToShow.getMonth() + 1}월`;
-    const startOfMonth = new Date(dateToShow.getFullYear(), dateToShow.getMonth(), 1);
-    const endOfMonth = new Date(dateToShow.getFullYear(), dateToShow.getMonth() + 1, 0);
-    const monthlyTransactions = transactions.filter(t => new Date(t.date) >= startOfMonth && new Date(t.date) <= endOfMonth);
-    const weeks = {};
-    monthlyTransactions.forEach(t => {
-        if (t.type === 'expense') {
-            const date = new Date(t.date);
-            const weekNumber = Math.ceil((date.getDate() + startOfMonth.getDay()) / 7);
-            if (!weeks[weekNumber]) weeks[weekNumber] = { transactions: [], total: 0 };
-            weeks[weekNumber].transactions.push(t);
-            weeks[weekNumber].total += t.amount;
-        }
-    });
-    historyDetailsContainer.innerHTML = '';
-    if (Object.keys(weeks).length === 0) {
-        historyDetailsContainer.innerHTML = '<div class="empty-state"><p>해당 월에 지출 내역이 없습니다.</p></div>';
-        return;
-    }
-    Object.keys(weeks).sort().forEach(weekNum => {
-        const weekData = weeks[weekNum];
-        const weekRow = document.createElement('div');
-        weekRow.className = 'weekly-summary-row';
-        weekRow.dataset.weekNum = weekNum;
-        weekRow.innerHTML = `<span>${weekNum}주차 지출</span><strong>${weekData.total.toLocaleString()}원</strong>`;
-        historyDetailsContainer.appendChild(weekRow);
-        const detailsList = document.createElement('ul');
-        detailsList.className = 'transaction-list-full';
-        detailsList.style.display = 'none';
-        historyDetailsContainer.appendChild(detailsList);
-    });
+    const period = historyPeriodSelect.value;
+    const selectedDate = historyDateInput.value ? new Date(historyDateInput.value) : new Date();
+    let filtered = [];
+    if (period === 'all') { filtered = transactions; } 
+    else if (period === 'daily') { const dayStr = selectedDate.toISOString().split('T')[0]; filtered = transactions.filter(t => t.date === dayStr); } 
+    else if (period === 'weekly') { const startOfWeek = new Date(selectedDate); startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay()); const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6); filtered = transactions.filter(t => new Date(t.date) >= startOfWeek && new Date(t.date) <= endOfWeek); }
+    else if (period === 'monthly') { const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1); const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0); filtered = transactions.filter(t => new Date(t.date) >= startOfMonth && new Date(t.date) <= endOfMonth); }
+    else if (period === 'yearly') { const startOfYear = new Date(selectedDate.getFullYear(), 0, 1); const endOfYear = new Date(selectedDate.getFullYear(), 11, 31); filtered = transactions.filter(t => new Date(t.date) >= startOfYear && new Date(t.date) <= endOfYear); }
+    renderTransactionList(filtered, filteredTransactionList, filteredTransactionEmptyState);
 }
 
-// --- 공통 함수 ---
 function applyDarkMode(isDark) {
     document.body.classList.toggle('dark-mode', isDark);
 }
@@ -282,27 +268,31 @@ function initialize() {
 // 5. 이벤트 리스너(Event Listeners)
 // ==================================
 function setupEventListeners() {
-    // ★★★ 모든 이벤트 리스너를 이곳에 통합하여 관리합니다. ★★★
-
     if (menuItems.length) {
         menuItems.forEach(item => {
             item.addEventListener('click', () => {
                 const pageId = item.getAttribute('data-page');
                 if (!pageId) return;
                 const allPages = [assetManagementPage, statisticsPage, transactionHistoryPage, settingsPage];
-                allPages.forEach(p => { if(p) p.style.display = 'none'; });
+                allPages.forEach(p => { if (p) p.style.display = 'none'; });
                 menuItems.forEach(m => m.classList.remove('active'));
                 const pageToShow = document.getElementById(pageId);
                 if (pageToShow) {
                     pageToShow.style.display = 'block';
                     item.classList.add('active');
                 }
-                if (currentUser) {
-                    if (pageId === 'asset-management-page') updateAllUI();
-                    else if (pageId === 'statistics-page') renderStatistics('monthly');
-                    else if (pageId === 'transaction-history-page') {
-                        displayedMonth = new Date();
-                        renderHistoryPage(displayedMonth);
+                if (pageId === 'asset-management-page' && currentUser) {
+                    updateAllUI();
+                } else if (currentUser) {
+                    if (pageId === 'statistics-page') {
+                        renderStatistics('monthly');
+                    } else if (pageId === 'transaction-history-page') {
+                        if (historyPeriodSelect) historyPeriodSelect.value = 'monthly';
+                        if (historyDateInput) {
+                            historyDateInput.valueAsDate = new Date();
+                            historyDateInput.style.display = 'none';
+                        }
+                        filterAndRenderHistory();
                     }
                 }
             });
@@ -310,40 +300,72 @@ function setupEventListeners() {
     }
 
     [listEl, filteredTransactionList].forEach(list => {
-        if (list) list.addEventListener('click', (event) => { /* ... */ });
-    });
-
-    if (historyDetailsContainer) {
-        historyDetailsContainer.addEventListener('click', (event) => {
-            const weekRow = event.target.closest('.weekly-summary-row');
-            if (weekRow) {
-                const weekNum = weekRow.dataset.weekNum;
-                const detailsList = weekRow.nextElementSibling;
-                const isOpened = detailsList.style.display === 'block';
-                if (isOpened) {
-                    detailsList.style.display = 'none';
-                } else {
-                    const startOfMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth(), 1);
-                    const weeklyTransactions = transactions.filter(t => {
-                        const date = new Date(t.date);
-                        return date.getFullYear() === startOfMonth.getFullYear() && date.getMonth() === startOfMonth.getMonth() &&
-                               Math.ceil((date.getDate() + startOfMonth.getDay()) / 7) == weekNum;
-                    });
-                    renderTransactionList(weeklyTransactions, detailsList, null);
-                    detailsList.style.display = 'block';
+        if (list) {
+            list.addEventListener('click', (event) => {
+                const header = event.target.closest('.date-group-header');
+                if (header) {
+                    header.classList.toggle('is-open');
+                    const groupBody = header.nextElementSibling;
+                    if (groupBody) groupBody.style.display = groupBody.style.display === 'none' ? 'block' : 'none';
+                    return;
                 }
-            }
-        });
-    }
-
-    if (prevMonthBtn) prevMonthBtn.addEventListener('click', () => { displayedMonth.setMonth(displayedMonth.getMonth() - 1); renderHistoryPage(displayedMonth); });
-    if (nextMonthBtn) nextMonthBtn.addEventListener('click', () => { displayedMonth.setMonth(displayedMonth.getMonth() + 1); renderHistoryPage(displayedMonth); });
+                if (event.target.classList.contains('delete-btn')) {
+                    const listItem = event.target.closest('li');
+                    const transactionId = listItem.dataset.id;
+                    if (confirm('정말 삭제하시겠습니까?')) {
+                        axios.delete(`/api/transactions/${transactionId}`).then(() => {
+                            transactions = transactions.filter(t => t._id !== transactionId);
+                            const activePage = document.querySelector('.menu-item.active').dataset.page;
+                            if (activePage === 'asset-management-page') updateAllUI();
+                            else if (activePage === 'transaction-history-page') filterAndRenderHistory();
+                        }).catch(err => { console.error(err); alert('삭제 중 오류 발생'); });
+                    }
+                }
+                const target = event.target;
+                if (target.classList.contains('editable') && !target.querySelector('input')) {
+                    const listItem = target.closest('li');
+                    const transactionId = listItem.dataset.id;
+                    const field = target.dataset.field;
+                    const transaction = transactions.find(t => t._id === transactionId);
+                    if (!transaction) return;
+                    const currentValue = transaction[field];
+                    const input = document.createElement('input');
+                    input.type = (field === 'amount') ? 'text' : 'text';
+                    if (field === 'amount') { input.inputMode = 'numeric'; input.pattern = '[0-9]*'; }
+                    input.value = currentValue;
+                    input.style.width = `${target.offsetWidth + 20}px`;
+                    target.innerHTML = '';
+                    target.appendChild(input);
+                    input.focus();
+                    const saveUpdate = async () => {
+                        const newValue = (field === 'amount') ? parseFloat(input.value.replace(/,/g, '')) || 0 : input.value;
+                        if (newValue !== currentValue) {
+                            try {
+                                await axios.put(`/api/transactions/${transactionId}`, { [field]: newValue });
+                                transaction[field] = newValue;
+                            } catch (error) { console.error('Error updating transaction:', error); }
+                        }
+                        const activePage = document.querySelector('.menu-item.active').dataset.page;
+                        if (activePage === 'asset-management-page') updateAllUI();
+                        else if (activePage === 'transaction-history-page') filterAndRenderHistory();
+                    };
+                    input.addEventListener('blur', saveUpdate);
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') saveUpdate();
+                        else if (e.key === 'Escape') {
+                            const activePage = document.querySelector('.menu-item.active').dataset.page;
+                            if (activePage === 'asset-management-page') updateAllUI();
+                            else if (activePage === 'transaction-history-page') filterAndRenderHistory();
+                        }
+                    });
+                }
+            });
+        }
+    });
 
     if (historyPeriodSelect) {
         historyPeriodSelect.addEventListener('change', () => {
-            if (historyDateInput) {
-                historyDateInput.style.display = (historyPeriodSelect.value === 'daily') ? 'block' : 'none';
-            }
+            if (historyDateInput) historyDateInput.style.display = (historyPeriodSelect.value === 'daily') ? 'block' : 'none';
         });
     }
     if (historyFilterBtn) {
@@ -354,22 +376,14 @@ function setupEventListeners() {
         formEl.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!currentUser) return;
-            const newTransaction = {
-                date: dateEl.value,
-                description: descriptionEl.value,
-                amount: parseFloat(amountEl.value),
-                category: categoryEl.value,
-                type: typeEl.value
-            };
+            const newTransaction = { date: dateEl.value, description: descriptionEl.value, amount: parseFloat(amountEl.value), category: categoryEl.value, type: typeEl.value };
             try {
                 const response = await axios.post('/api/transactions', newTransaction);
                 transactions.push(response.data);
                 updateAllUI();
                 formEl.reset();
                 if(dateEl) dateEl.valueAsDate = new Date();
-            } catch (error) {
-                console.error("Error adding transaction:", error);
-            }
+            } catch (error) { console.error("Error adding transaction:", error); }
         });
     }
 
@@ -395,10 +409,7 @@ function setupEventListeners() {
                 const item = document.createElement('li');
                 item.classList.add('modal-asset-item');
                 item.dataset.id = asset._id;
-                item.innerHTML = `
-                    <span>${asset.name}</span>
-                    <input type="text" value="${asset.amount}" inputmode="numeric" pattern="[0-9]*">
-                    <button class="delete-btn">삭제</button>`;
+                item.innerHTML = `<span>${asset.name}</span><input type="text" value="${asset.amount}" inputmode="numeric" pattern="[0-9]*"><button class="delete-btn">삭제</button>`;
                 modalAssetList.appendChild(item);
             });
             assetEditModal.style.display = 'flex';
@@ -450,7 +461,7 @@ function setupEventListeners() {
     
     if (clearDataBtn) {
         clearDataBtn.addEventListener('click', async () => {
-            if (!currentUser) return alert("로그인이 필요합니다.");
+            if (!currentUser) return;
             if (confirm('정말로 모든 거래내역과 자산을 삭제하시겠습니까?')) {
                 try {
                     await axios.delete('/api/data');
@@ -461,7 +472,7 @@ function setupEventListeners() {
             }
         });
     }
-
+    
     if (statsTabs) {
         statsTabs.addEventListener('click', (event) => {
             if (event.target.tagName === 'BUTTON') {
@@ -471,6 +482,7 @@ function setupEventListeners() {
         });
     }
 }
+
 
 // ==================================
 // 6. 앱 시작
