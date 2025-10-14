@@ -2,14 +2,15 @@
 /* 1. 기본 및 전역 스타일 */
 /* ================================== */
 * {
-    box-sizing: border-box; /* 모든 요소에 box-sizing 적용하여 레이아웃 오류 방지 */
+    box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9; /* 배경색을 약간 부드럽게 변경 */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f4f9;
     color: #333;
     margin: 0;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 h1, h2, h3 {
@@ -40,18 +41,18 @@ h1, h2, h3 {
 }
 
 .kakao-login-btn {
-    display: inline-flex; /* 아이콘과 텍스트를 나란히 배치 */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: #FEE500; /* 카카오 노란색 */
-    color: #3C1E1E; /* 카카오 글씨 색상과 유사하게 */
+    background-color: #FEE500;
+    color: #3C1E1E;
     padding: 0 20px;
     height: 50px;
     border: none;
     border-radius: 12px;
     font-size: 1.1em;
     font-weight: bold;
-    text-decoration: none; /* a 태그의 밑줄 제거 */
+    text-decoration: none;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -75,8 +76,6 @@ h1, h2, h3 {
 /* ================================== */
 /* 3. 메인 앱 레이아웃 */
 /* ================================== */
-
-
 .app-container {
     display: flex;
     width: 100%;
@@ -90,47 +89,14 @@ h1, h2, h3 {
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
+    transition: background-color 0.3s;
 }
 
 .main-content {
     flex-grow: 1;
     padding: 30px;
     background-color: #f4f4f9;
-}
-
-.total-balance-display {
-    text-align: right;
-    font-size: 1.5em;
-    font-weight: 300;
-    margin-bottom: 20px;
-}
-
-/* 숫자 부분 스타일 */
-.total-balance-display span {
-    font-weight: 600;
-    font-size: 1.2em;
-    margin: 0 2px;
-}
-
-/* '원' 글씨 스타일 */
-.total-balance-display .won-unit {
-    font-weight: 500;
-    font-size: 1em;
-    opacity: 0.8;
-    margin-left: 5px;
-    color: #5c67f2;
-}
-
-/* 다크 모드에서 '원' 글씨 강조 */
-body.dark-mode .total-balance-display .won-unit {
-    color: #7a83f5;
-}
-
-.chart-container {
-    position: relative; /* 팝업의 기준점이 됨 */
-    width: 200px; /* 원형 그래프의 크기 */
-    height: 200px;
-    margin: 0 auto 20px auto; /* 가운데 정렬 */
+    transition: background-color 0.3s;
 }
 
 /* ================================== */
@@ -143,6 +109,7 @@ body.dark-mode .total-balance-display .won-unit {
     border-bottom: 1px solid #eee;
     font-weight: bold;
     font-size: 1.5em;
+    color: #333;
 }
 
 .user-info {
@@ -204,21 +171,16 @@ body.dark-mode .total-balance-display .won-unit {
 }
 
 /* ================================== */
-/* 6. 폼 관련 스타일 (자산 추가, 소득/지출 추가) */
+/* 6. 폼 관련 스타일 */
 /* ================================== */
-
-
-/* 폼 태그 자체는 눈에 보이지 않는 '그룹' 역할만 하도록 설정 */
 #add-asset-form,
 #transaction-form {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
     width: 100%;
-    /* 배경색, 패딩, 테두리 등 시각적 스타일을 모두 제거합니다. */
 }
 
-/* 두 폼의 모든 입력창(input, select) 공통 스타일 */
 #add-asset-form input,
 #transaction-form input,
 #transaction-form select {
@@ -234,7 +196,6 @@ body.dark-mode .total-balance-display .won-unit {
     min-width: 0;
 }
 
-/* 두 폼의 입력창 포커스(클릭) 시 공통 효과 */
 #add-asset-form input:focus,
 #transaction-form input:focus,
 #transaction-form select:focus {
@@ -243,13 +204,11 @@ body.dark-mode .total-balance-display .won-unit {
     box-shadow: 0 0 0 3px rgba(92, 103, 242, 0.2);
 }
 
-/* 두 폼의 플레이스홀더(안내 문구) 공통 스타일 */
 #add-asset-form input::placeholder,
 #transaction-form input::placeholder {
     color: #888;
 }
 
-/* 두 폼의 버튼 공통 스타일 */
 #add-asset-form button,
 #transaction-form button {
     background-color: #5c67f2;
@@ -260,57 +219,33 @@ body.dark-mode .total-balance-display .won-unit {
     padding: 8px 20px;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    flex-shrink: 0; /* 버튼 크기가 줄어들지 않도록 설정 */
+    flex-shrink: 0;
 }
 
-/* 두 폼의 버튼에 마우스 올렸을 때 공통 효과 */
 #add-asset-form button:hover,
 #transaction-form button:hover {
     background-color: #4a54c2;
 }
 
-/* ----- 다크 모드에서도 두 폼에 공통 적용 ----- */
-body.dark-mode #add-asset-form input,
-body.dark-mode #transaction-form input,
-body.dark-mode #transaction-form select {
-    background-color: #33333d;
-    border-color: transparent;
-    color: #f0f0f0;
+.button-secondary {
+    background-color: #f0f2f5;
+    color: #555;
+    font-weight: 500;
 }
-
-body.dark-mode #add-asset-form input::placeholder,
-body.dark-mode #transaction-form input::placeholder {
-    color: #888;
-}
-
-body.dark-mode #add-asset-form input:focus,
-body.dark-mode #transaction-form input:focus,
-body.dark-mode #transaction-form select:focus {
-    border-color: #7a83f5;
-    background-color: #1e1e1e;
-    box-shadow: 0 0 0 3px rgba(122, 131, 245, 0.25);
-}
-
-body.dark-mode #add-asset-form button,
-body.dark-mode #transaction-form button {
-    background-color: #7a83f5;
-}
-
-body.dark-mode #add-asset-form button:hover,
-body.dark-mode #transaction-form button:hover {
-    background-color: #5c67f2;
+.button-secondary:hover {
+    background-color: #e2e2e7;
 }
 
 /* ================================== */
 /* 7. 거래 내역 리스트 */
 /* ================================== */
-#transaction-list {
+#transaction-list, .transaction-list-full {
     list-style: none;
     padding: 0;
 }
 
 .date-group-header {
-    padding: 8px; /* 내부 여백을 약간 조정 */
+    padding: 8px;
     border-radius: 8px;
     cursor: pointer;
     margin-top: 20px;
@@ -331,40 +266,37 @@ body.dark-mode #transaction-form button:hover {
 .date-header-left {
     display: flex;
     align-items: center;
-    gap: 12px; /* 아이콘과 날짜 사이의 간격 */
+    gap: 12px;
 }
 
-/* ★★★ 토글 아이콘 버튼 스타일 ★★★ */
 .toggle-icon {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 28px;
     height: 28px;
-    background-color: #e2e2e7; /* 아이콘만의 별도 배경 */
+    background-color: #e2e2e7;
     border-radius: 6px;
     transition: background-color 0.2s ease;
 }
 
-/* 화살표 모양 만들기 */
 .toggle-icon::before {
     content: '';
     border: solid #555;
     border-width: 0 2px 2px 0;
     display: inline-block;
     padding: 3px;
-    transform: rotate(-45deg); /* 오른쪽 화살표(>) */
+    transform: rotate(-45deg);
     transition: transform 0.2s ease-in-out;
 }
 
-/* 그룹이 열렸을 때 (is-open 클래스가 있을 때) 스타일 */
 .date-group-header.is-open .toggle-icon {
-    background-color: #5c67f2; /* 활성화 시 배경색 변경 */
+    background-color: #5c67f2;
 }
 
 .date-group-header.is-open .toggle-icon::before {
-    border-color: white; /* 아이콘 색상 변경 */
-    transform: rotate(45deg); /* 아래쪽 화살표(v) */
+    border-color: white;
+    transform: rotate(45deg);
 }
 
 .daily-expense {
@@ -373,51 +305,29 @@ body.dark-mode #transaction-form button:hover {
     padding-right: 10px;
 }
 
-/* --- 다크 모드 스타일 --- */
-body.dark-mode .date-group-header {
-    background-color: #2c2c2c;
-    color: #e0e0e0;
-}
-body.dark-mode .date-group-header:hover {
-    background-color: #3a3a3a;
-}
-body.dark-mode .toggle-icon {
-    background-color: #444;
-}
-body.dark-mode .toggle-icon::before {
-    border-color: #e0e0e0;
-}
-body.dark-mode .date-group-header.is-open .toggle-icon {
-    background-color: #7a83f5;
-}
-body.dark-image .date-group-header.is-open .toggle-icon::before {
-    border-color: white;
-}
-
 .transaction-group-body {
     list-style: none;
     padding: 0;
     margin-top: 10px;
 }
 
-#transaction-list li {
+#transaction-list li, .transaction-list-full li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 15px; /* 상하 패딩을 줄여 높이를 낮춤 */
+    padding: 8px 15px;
     margin-bottom: 8px;
     border: 1px solid #eee;
     border-radius: 8px;
     transition: background-color 0.2s ease;
 }
 
-#transaction-list li:hover {
-    background-color: #f9f9fb; /* 마우스를 올렸을 때 배경색 변경 */
+#transaction-list li:hover, .transaction-list-full li:hover {
+    background-color: #f9f9fb;
 }
 
-#transaction-list li > div {
+#transaction-list li > div, .transaction-list-full li > div {
     display: flex;
-    flex-direction: row;
     align-items: baseline;
     gap: 8px;
 }
@@ -429,7 +339,6 @@ body.dark-image .date-group-header.is-open .toggle-icon::before {
 .category-label {
     color: #777;
     font-size: 0.85em;
-    margin-top: 0;
 }
 
 .transaction-amount-container {
@@ -469,357 +378,37 @@ body.dark-image .date-group-header.is-open .toggle-icon::before {
     background-color: #e0e0e0;
 }
 
-body.dark-mode .editable:hover {
-    background-color: #444;
-}
-
-body.dark-mode #transaction-list li:hover {
-    background-color: #2a2a30;
-}
-
 /* ================================== */
-/* 8. 기타 페이지 (통계, 설정) */
+/* 8. 자산 및 통계 페이지 */
 /* ================================== */
-
-.statistics-container {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-.stats-block { flex: 1; min-width: 250px; }
-.stats-block ul { list-style: none; padding: 0; text-align: left; }
-.stats-block li { padding: 8px 0; border-bottom: 1px solid #eee; }
-.stats-block h3 { margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-
-.setting-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-}
-.setting-item:last-child { border-bottom: none; }
-
-.switch { position: relative; display: inline-block; width: 50px; height: 28px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
-.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
-input:checked + .slider { background-color: #5c67f2; }
-input:checked + .slider:before { transform: translateX(22px); }
-.slider.round { border-radius: 28px; }
-.slider.round:before { border-radius: 50%; }
-
-/* ================================== */
-/* 9. 다크 모드 (Dark Mode) */
-/* ================================== */
-body.dark-mode {
-    background-color: #121212;
-    color: #f0f0f0;
-}
-body.dark-mode .sidebar {
-    background-color: #1e1e1e;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-}
-body.dark-mode .main-content {
-    background-color: #121212;
-}
-body.dark-mode h2, body.dark-mode h3 { color: #e0e0e0; }
-body.dark-mode .summary, body.dark-mode .input-form, body.dark-mode .history,
-body.dark-mode .stats-block, body.dark-mode .settings-block {
-    background-color: #1e1e1e;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-body.dark-mode .user-info { background-color: #33333d; }
-body.dark-mode .menu-item:hover { background-color: #33333d; }
-body.dark-mode .menu-item.active { background-color: #5c67f2; }
-body.dark-mode #add-asset-form input {
-    background-color: #33333d;
-    border-color: #444;
-    color: #f0f0f0;
-}
-body.dark-mode #transaction-form { background-color: #25252d; }
-body.dark-mode #transaction-form input, body.dark-mode #transaction-form select {
-    background-color: #33333d;
-    border-color: transparent;
-    color: #f0f0f0;
-}
-body.dark-mode #transaction-form input::placeholder { color: #888; }
-body.dark-mode #transaction-form input:focus, body.dark-mode #transaction-form select:focus {
-    border-color: #7a83f5;
-    background-color: #1e1e1e;
-    box-shadow: 0 0 0 3px rgba(122, 131, 245, 0.25);
-}
-body.dark-mode #transaction-form button { background-color: #7a83f5; }
-body.dark-mode #transaction-form button:hover { background-color: #5c67f2; }
-body.dark-mode .date-group-header { background-color: #2c2c2c; }
-body.dark-mode #transaction-list li { border-color: #333; }
-body.dark-mode .category-label { color: #bbb; }
-body.dark-mode .stats-block li, body.dark-mode .setting-item { border-color: #333; }
-
-/* ================================== */
-/* 10. 반응형 디자인 (모바일) */
-/* ================================== */
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column;
-    }
-    .sidebar {
-        width: 100%;
-        height: auto;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border-right: none;
-        padding: 10px 15px; /* 좌우 여백 추가 */
-        display: flex; /* Flexbox 레이아웃으로 변경 */
-        flex-direction: row; /* 가로 방향 정렬 */
-        justify-content: space-between; /* 양쪽 끝으로 배치 */
-        align-items: center; /* 세로 중앙 정렬 */
-    }
-
-    /* 사용자 정보창 스타일 (모바일용) */
-    .user-info {
-        padding: 0;
-        margin: 0;
-        background-color: transparent;
-        box-shadow: none;
-        text-align: left;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* 'MENU' 텍스트 숨김 */
-    .sidebar-header {
-        display: none;
-    }
-    .menu-list {
-        display: flex;
-        justify-content: space-around;
-    }
-    .menu-item { padding: 10px 5px; }
-    .main-content { padding: 15px; }
-    #transaction-form {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 15px;
-    }
-    #transaction-list li {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    .transaction-amount-container {
-        width: 100%;
-        justify-content: space-between;
-    }
-    .transaction-amount { text-align: right; }
-    .statistics-container { flex-direction: column; }
-}
-
-/* ================================== */
-/* 11. 자산 수정 버튼 및 팝업(모달) 스타일 (수정) */
-/* ================================== */
-.button-secondary {
-    background-color: #f0f2f5;
-    color: #555;
-    font-weight: 500;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-.button-secondary:hover {
-    background-color: #e2e2e7;
-}
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    max-width: 450px;
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    text-align: center;
+.total-balance-display {
+    text-align: right;
+    font-size: 1.5em;
+    font-weight: 300;
     margin-bottom: 20px;
 }
 
-#modal-asset-list {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 25px;
-    max-height: 40vh; /* 목록이 길어지면 스크롤 생성 */
-    overflow-y: auto;
+.total-balance-display span {
+    font-weight: 600;
+    font-size: 1.2em;
+    margin: 0 2px;
 }
 
-.modal-asset-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-.modal-asset-item:last-child {
-    border-bottom: none;
-}
-
-.modal-asset-item span {
-    flex-basis: 35%; /* 자산 이름 영역 너비 */
+.total-balance-display .won-unit {
     font-weight: 500;
-}
-
-.modal-asset-item input {
-    flex-grow: 1; /* 남은 공간 모두 차지 */
-    background-color: #f0f2f5;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 8px 12px;
     font-size: 1em;
-    outline: none;
-    transition: all 0.2s ease;
-}
-.modal-asset-item input:focus {
-    background-color: white;
-    border-color: #5c67f2;
+    opacity: 0.8;
+    margin-left: 5px;
+    color: #5c67f2;
 }
 
-#modal-close-btn {
-    width: 100%;
-    background-color: #5c67f2;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-#modal-close-btn:hover {
-    background-color: #4a54c2;
+.chart-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px auto;
 }
 
-/* --- 다크 모드 팝업 스타일 --- */
-body.dark-mode .button-secondary {
-    background-color: #33333d;
-    color: #f0f0f0;
-}
-body.dark-mode .button-secondary:hover {
-    background-color: #444;
-}
-body.dark-mode .modal-content {
-    background-color: #1e1e1e;
-}
-body.dark-mode .modal-asset-item {
-    border-color: #333;
-}
-body.dark-mode .modal-asset-item input {
-    background-color: #33333d;
-    color: #f0f0f0;
-    border-color: transparent;
-}
-body.dark-mode .modal-asset-item input:focus {
-    background-color: #1e1e1e;
-    border-color: #7a83f5;
-}
-body.dark-mode #modal-close-btn {
-    background-color: #7a83f5;
-}
-body.dark-mode #modal-close-btn:hover {
-    background-color: #5c67f2;
-}
-
-/*삭제 버튼 */
-#clear-data-btn {
-    background-color: #e74c3c; /* 붉은색 계열 */
-    color: white;
-    font-weight: 500;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 15px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#clear-data-btn:hover {
-    background-color: #c0392b;
-}
-
-/* 다크모드일 때도 잘 보이도록 */
-body.dark-mode #clear-data-btn {
-    background-color: #a43a2e;
-}
-
-body.dark-mode #clear-data-btn:hover {
-    background-color: #c0392b;
-}
-
-/* --- 로딩 스피너 스타일 --- */
-.spinner-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    display: none; /* 평소에는 숨김 */
-}
-
-.spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top: 4px solid #fff;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* --- 빈 상태(Empty State) 스타일 --- */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    background-color: #f0f2f5;
-    border-radius: 8px;
-    margin-top: 20px;
-}
-.empty-state p {
-    margin: 0;
-    color: #888;
-    font-size: 0.95em;
-}
-
-body.dark-mode .empty-state {
-    background-color: #25252d;
-}
-body.dark-mode .empty-state p {
-    color: #aaa;
-}
-
-/* --- 통계 페이지 리디자인 스타일 --- */
 .stats-tabs {
     display: flex;
     gap: 10px;
@@ -873,27 +462,42 @@ body.dark-mode .empty-state p {
     margin: 0 auto;
 }
 
-/* --- 다크 모드 통계 스타일 --- */
-body.dark-mode .stats-tab-btn {
-    border-color: #444;
-    color: #888;
+/* ================================== */
+/* 9. 환경설정 및 기타 페이지 */
+/* ================================== */
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
 }
+.setting-item:last-child { border-bottom: none; }
 
-body.dark-mode .stats-tab-btn.active {
-    background-color: #7a83f5;
-    border-color: #7a83f5;
+.switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: #5c67f2; }
+input:checked + .slider:before { transform: translateX(22px); }
+.slider.round { border-radius: 28px; }
+.slider.round:before { border-radius: 50%; }
+
+#clear-data-btn {
+    background-color: #e74c3c;
     color: white;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-body.dark-mode .stats-content {
-    background-color: #2c2c2c;
+#clear-data-btn:hover {
+    background-color: #c0392b;
 }
 
-body.dark-mode .comparison-stat {
-    color: #aaa;
-}
-
-/* --- 지출 내역 페이지 필터 및 목록 스타일 --- */
 .filter-controls {
     display: flex;
     gap: 10px;
@@ -909,12 +513,10 @@ body.dark-mode .comparison-stat {
     background-color: white;
     font-size: 0.95em;
     outline: none;
-    flex-grow: 1; /* 가로로 늘어나게 */
-    max-width: 150px; /* 적당한 최대 너비 */
+    max-width: 150px;
 }
 
 .filter-controls button {
-    /* 기존 버튼 스타일과 통일 */
     background-color: #5c67f2;
     color: white;
     font-weight: bold;
@@ -928,22 +530,263 @@ body.dark-mode .comparison-stat {
     background-color: #4a54c2;
 }
 
-.transaction-list-full {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+
+/* ================================== */
+/* 10. 팝업(모달) 및 오버레이 */
+/* ================================== */
+.spinner-overlay, .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    display: none;
 }
 
-/* 다크 모드 */
-body.dark-mode .filter-controls select,
-body.dark-mode .filter-controls input[type="date"] {
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid #fff;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 450px;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#modal-asset-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.modal-asset-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.modal-asset-item:last-child {
+    border-bottom: none;
+}
+
+.modal-asset-item span {
+    flex-basis: 35%;
+    font-weight: 500;
+}
+
+.modal-asset-item input {
+    flex-grow: 1;
+    background-color: #f0f2f5;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 1em;
+    outline: none;
+    transition: all 0.2s ease;
+}
+.modal-asset-item input:focus {
+    background-color: white;
+    border-color: #5c67f2;
+}
+
+#modal-close-btn {
+    width: 100%;
+    background-color: #5c67f2;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#modal-close-btn:hover {
+    background-color: #4a54c2;
+}
+
+
+/* ================================== */
+/* 11. 기타 공통 컴포넌트 */
+/* ================================== */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+.empty-state p {
+    margin: 0;
+    color: #888;
+    font-size: 0.95em;
+}
+
+
+/* ================================== */
+/* 12. 다크 모드 (Dark Mode) */
+/* ================================== */
+body.dark-mode {
+    background-color: #121212;
+    color: #f0f0f0;
+}
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 {
+    color: #e0e0e0;
+}
+body.dark-mode .sidebar {
+    background-color: #1e1e1e;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    border-color: #333;
+}
+body.dark-mode .main-content {
+    background-color: #121212;
+}
+body.dark-mode .summary, body.dark-mode .input-form, body.dark-mode .history,
+body.dark-mode .stats-block, body.dark-mode .settings-block {
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .user-info { background-color: #33333d; }
+body.dark-mode #logout-link { color: #aaa; }
+body.dark-mode .sidebar-header { border-color: #333; color: #f0f0f0; }
+body.dark-mode .menu-item:hover { background-color: #33333d; }
+body.dark-mode .menu-item.active { background-color: #5c67f2; color: white; }
+body.dark-mode .total-balance-display .won-unit { color: #7a83f5; }
+body.dark-mode #add-asset-form input, body.dark-mode #transaction-form input,
+body.dark-mode #transaction-form select {
+    background-color: #33333d;
+    border-color: transparent;
+    color: #f0f0f0;
+}
+body.dark-mode #add-asset-form input::placeholder,
+body.dark-mode #transaction-form input::placeholder { color: #888; }
+body.dark-mode #add-asset-form input:focus, body.dark-mode #transaction-form input:focus,
+body.dark-mode #transaction-form select:focus {
+    border-color: #7a83f5;
+    background-color: #1e1e1e;
+    box-shadow: 0 0 0 3px rgba(122, 131, 245, 0.25);
+}
+body.dark-mode #add-asset-form button, body.dark-mode #transaction-form button {
+    background-color: #7a83f5;
+}
+body.dark-mode #add-asset-form button:hover, body.dark-mode #transaction-form button:hover {
+    background-color: #5c67f2;
+}
+body.dark-mode .button-secondary { background-color: #33333d; color: #f0f0f0; }
+body.dark-mode .button-secondary:hover { background-color: #444; }
+body.dark-mode .date-group-header { background-color: #2c2c2c; color: #e0e0e0; }
+body.dark-mode .date-group-header:hover { background-color: #3a3a3a; }
+body.dark-mode .toggle-icon { background-color: #444; }
+body.dark-mode .toggle-icon::before { border-color: #e0e0e0; }
+body.dark-mode .date-group-header.is-open .toggle-icon { background-color: #7a83f5; }
+body.dark-mode .date-group-header.is-open .toggle-icon::before { border-color: white; }
+body.dark-mode #transaction-list li, body.dark-mode .transaction-list-full li { border-color: #333; }
+body.dark-mode #transaction-list li:hover, body.dark-mode .transaction-list-full li:hover { background-color: #2a2a30; }
+body.dark-mode .category-label { color: #bbb; }
+body.dark-mode .editable:hover { background-color: #444; }
+body.dark-mode .stats-tab-btn { border-color: #444; color: #888; }
+body.dark-mode .stats-tab-btn.active { background-color: #7a83f5; border-color: #7a83f5; color: white; }
+body.dark-mode .stats-content { background-color: #2c2c2c; }
+body.dark-mode .comparison-stat { color: #aaa; }
+body.dark-mode .stats-block li, body.dark-mode .setting-item { border-color: #333; }
+body.dark-mode #clear-data-btn { background-color: #a43a2e; }
+body.dark-mode #clear-data-btn:hover { background-color: #c0392b; }
+body.dark-mode .filter-controls select, body.dark-mode .filter-controls input[type="date"] {
     background-color: #33333d;
     border-color: #444;
     color: #e0e0e0;
 }
-body.dark-mode .filter-controls button {
-    background-color: #7a83f5;
-}
-body.dark-mode .filter-controls button:hover {
-    background-color: #5c67f2;
+body.dark-mode .filter-controls button { background-color: #7a83f5; }
+body.dark-mode .filter-controls button:hover { background-color: #5c67f2; }
+body.dark-mode .modal-content { background-color: #2c2c2c; }
+body.dark-mode .modal-asset-item { border-color: #444; }
+body.dark-mode .modal-asset-item input { background-color: #3a3a4a; color: #f0f0f0; border-color: transparent; }
+body.dark-mode .modal-asset-item input:focus { background-color: #1e1e1e; border-color: #7a83f5; }
+body.dark-mode #modal-close-btn { background-color: #7a83f5; }
+body.dark-mode #modal-close-btn:hover { background-color: #5c67f2; }
+body.dark-mode .empty-state { background-color: #25252d; }
+body.dark-mode .empty-state p { color: #aaa; }
+
+/* ================================== */
+/* 13. 반응형 디자인 (모바일) */
+/* ================================== */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-right: none;
+        padding: 10px 15px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .user-info {
+        padding: 0;
+        margin: 0;
+        background-color: transparent;
+        box-shadow: none;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sidebar-header {
+        display: none;
+    }
+    .menu-list {
+        display: flex;
+        justify-content: flex-end;
+        gap: 5px;
+    }
+    .menu-item { padding: 10px 8px; font-size: 0.9em; }
+    .main-content { padding: 15px; }
+    #add-asset-form, #transaction-form {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+    }
+    #transaction-list li, .transaction-list-full li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .transaction-amount-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .transaction-amount { text-align: right; }
+    .stats-tabs {
+        justify-content: center;
+    }
 }
