@@ -95,28 +95,31 @@ function updateAllUI() {
 }
 
 async function loadAllData() {
-    try {
-        const userResponse = await axios.get('/api/user'); // API 경로로 변경
-        currentUser = userResponse.data;
-        userInfo.innerHTML = `
-            <p>안녕하세요, ${currentUser.nickname}님!</p>
-            <a href="/api/logout" id="logout-link">로그아웃</a>        `;
-        // 사용자 정보를 받은 후에 해당 사용자의 데이터를 요청합니다.
-        const transactionResponse = await axios.get(`/api/transactions?userId=${currentUser.kakaoId}`);
-        const assetResponse = await axios.get(`/api/assets?userId=${currentUser.kakaoId}`);
-        transactions = transactionResponse.data;
-        assets = assetResponse.data;
+    try {
+        const userResponse = await axios.get('/user');
+        currentUser = userResponse.data;
+        userInfo.innerHTML = `
+            <p>안녕하세요, ${currentUser.nickname}님!</p>
+            <a href="/logout" id="logout-link">로그아웃</a>
+        `;
+        const transactionResponse = await axios.get(`/api/transactions?userId=${currentUser.kakaoId}`);
+        const assetResponse = await axios.get(`/api/assets?userId=${currentUser.kakaoId}`);
+        transactions = transactionResponse.data;
+        assets = assetResponse.data;
 
-    } catch (error) {
-        userInfo.innerHTML = `
-            <p>로그인이 필요합니다.</p>
-            <a href="/api/auth/kakao" id="login-link">카카오톡으로 로그인</a>        `;
-        transactions = [];
-        assets = [];
-    }
+    } catch (error) {
+        userInfo.innerHTML = `
+            <p>로그인이 필요합니다.</p>
+            <a href="/auth/kakao" id="login-link">카카오톡으로 로그인</a>
+        `;
+        transactions = [];
+        assets = [];
+    }
 
-    updateAllUI();
+    updateAllUI();
 }
+
+loadAllData();
 
 function updateStatisticsUI() {
     yearlyListEl.innerHTML = '';
@@ -256,6 +259,21 @@ listEl.addEventListener('click', async (event) => {
 });
 
 
+assetListEl.addEventListener('input', async (event) => {
+    if (event.target.classList.contains('editable-amount')) {
+        const assetName = event.target.dataset.name;
+        const newAmountStr = event.target.innerText.replace(/[^0-9]/g, '');
+        const newAmount = parseInt(newAmountStr) || 0;
+        const assetToUpdate = assets.find(a => a.name === assetName);
+        if (assetToUpdate) {
+            assetToUpdate.amount = newAmount;
+            await axios.put(`/api/assets/${assetToUpdate._id}`, { amount: newAmount });
+            updateAllUI();
+        }
+    }
+});
+
+
 clearDataBtn.addEventListener('click', async () => {
     if (!currentUser) {
         alert("로그인이 필요합니다.");
@@ -296,5 +314,3 @@ darkModeToggle.addEventListener('change', () => {
         localStorage.setItem('darkMode', 'disabled');
     }
 });
-
-
