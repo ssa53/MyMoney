@@ -206,6 +206,37 @@ app.delete('/api/transactions/:id', async (req, res) => {
     res.status(200).json({ message: 'Transaction deleted.' });
 });
 
+// ★★★ 자산 금액 수정을 위한 API (PUT 메서드) ★★★
+app.put('/api/assets/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const userId = req.session.user.kakaoId;
+    const assetId = req.params.id;
+    const { amount } = req.body; // 프론트에서 보낸 새로운 금액
+
+    // amount가 숫자가 아니거나 음수이면 에러 처리
+    if (typeof amount !== 'number' || amount < 0) {
+        return res.status(400).json({ error: 'Invalid amount' });
+    }
+
+    try {
+        const updatedAsset = await Asset.findOneAndUpdate(
+            { _id: assetId, userId: userId }, // 조건: 내 소유의 자산 id
+            { amount: amount }, // 변경할 내용
+            { new: true } // 변경된 결과를 반환
+        );
+
+        if (!updatedAsset) {
+            return res.status(404).json({ error: 'Asset not found' });
+        }
+        res.status(200).json(updatedAsset);
+    } catch (error) {
+        console.error('Error updating asset:', error);
+        res.status(500).json({ error: 'Server error while updating asset' });
+    }
+});
+
 app.get('/api/assets', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
