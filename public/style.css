@@ -97,16 +97,35 @@ h1, h2, h3 {
 }
 
 .total-balance-display {
-    font-size: 1.8em; /* 글자 크기를 키움 */
-    font-weight: 300; /* 폰트를 약간 얇게 */
-    text-align: right;
-    margin-bottom: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 정중앙 배치 */
+    text-align: center;
+    font-size: 1em; /* 기본 글자 크기 조정 */
+    font-weight: 300;
+    pointer-events: none; /* 텍스트 아래의 차트가 클릭/호버 되도록 함 */
+    width: 100%; /* 너비를 꽉 채워 줄바꿈이 자연스럽게 되도록 */
 }
 
 .total-balance-display span {
-    font-weight: bold;
+    font-weight: 600; /* 숫자 폰트 굵게 */
     font-size: 1.2em;
-    margin: 0 4px;
+    margin: 0 2px;
+}
+
+/* '원' 글씨 스타일 (강조) */
+.total-balance-display .won-unit {
+    font-weight: 600;
+    font-size: 1.1em; /* '원' 글씨 크기 */
+    opacity: 0.9;
+    margin-left: 5px;
+    color: #5c67f2; /* 테마 색상으로 강조 */
+}
+
+/* 다크 모드에서 '원' 글씨 강조 */
+body.dark-mode .total-balance-display .won-unit {
+    color: #7a83f5;
 }
 
 .chart-container {

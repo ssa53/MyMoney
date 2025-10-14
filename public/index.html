@@ -24,10 +24,11 @@
             <div id="asset-management-page">
                 <div class="summary">
                     <h2>자산 현황</h2>
-                    <div class="content-container">
+                    
+                    <div class="chart-container">
+                        <div id="total-balance-korean" class="total-balance-display"></div>
                         <canvas id="assetChart"></canvas>
-                        <div id="asset-list-details" class="asset-list-popup">
-                            </div>
+                        <div id="asset-list-details" class="asset-list-popup"></div>
                     </div>
                     <form id="add-asset-form">
                         <input type="text" id="asset-name" placeholder="자산 이름 (ex. 주식, 예금)" required>

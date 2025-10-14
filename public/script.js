@@ -67,7 +67,10 @@ function renderAssetChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
+            plugins: { legend: { display: false } },
+            tooltip: {
+                enabled: false
+            }
         }
     });
 
@@ -88,10 +91,12 @@ function renderAssetChart() {
 
 // ★★★ 숫자를 한글 단위로 변환하는 함수 추가 ★★★
 function formatToKoreanWon(number) {
-    if (number === 0) return '0 원';
+    if (number === 0) return '0 <span class="won-unit">원</span>'; // 0일 때도 적용
+
     const units = ['', '만', '억', '조'];
     let result = '';
     let unitIndex = 0;
+
     while (number > 0) {
         const part = number % 10000;
         if (part > 0) {
@@ -104,12 +109,14 @@ function formatToKoreanWon(number) {
             if (t > 0) partStr += `<span>${t}</span>백 `;
             if (d > 0) partStr += `<span>${d}</span>십 `;
             if (o > 0) partStr += `<span>${o}</span>`;
+            
             result = `${partStr.trim()} ${units[unitIndex]} ${result}`;
         }
         number = Math.floor(number / 10000);
         unitIndex++;
     }
-    return result.trim() + ' 원';
+    // ★★★ 마지막 '원'을 span으로 감싸서 반환 ★★★
+    return result.trim() + ` <span class="won-unit">원</span>`;
 }
 
 // ★★★ 로그인 상태에 따라 UI 가시성을 제어하는 함수 추가 ★★★
