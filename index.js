@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 const session = require('express-session');
 const dbConnect = require('./lib/dbConnect');
+const MongoStore = require('connect-mongo');
 
 // MongoDB 사용자 스키마 정의
 const userSchema = new mongoose.Schema({
@@ -68,13 +69,15 @@ app.use(async (req, res, next) => {
 });
 
 app.use(session({
-  secret: process.env.SECRET_COOKIE_PASSWORD, // 환경변수 사용 권장
-  resave: false,
-  saveUninitialized: true,
+  secret: process.env.SECRET_COOKIE_PASSWORD,
+  resave: false, // 세션이 변경되지 않으면 다시 저장하지 않음 (권장)
+  saveUninitialized: false, // 로그인한 사용자에게만 세션을 생성 (권장)
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI // 세션을 저장할 MongoDB 연결 주소
+  }),
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24, // 1 day
-    // Vercel 배포 시 secure 옵션은 자동으로 처리되는 경우가 많습니다.
-    // secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 동안 로그인 유지
+    secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 HTTPS에서만 쿠키 전송
   }
 }));
 
