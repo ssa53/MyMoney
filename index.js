@@ -4,6 +4,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const axios = require('axios');
 const session = require('express-session');
+const dbConnect = require('./lib/dbConnect');
 
 // MongoDB 사용자 스키마 정의
 const userSchema = new mongoose.Schema({
@@ -56,13 +57,25 @@ const port = 3000;
 // =========================================================
 // 미들웨어 설정
 // =========================================================
+app.use(async (req, res, next) => {
+  try {
+    await dbConnect();
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(503).send('Service Unavailable');
+  }
+});
+
 app.use(session({
-    secret: 'mysecretkey',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 1000 * 60 * 60 * 24,
-        secure: true}
+  secret: process.env.SECRET_COOKIE_PASSWORD, // 환경변수 사용 권장
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    // Vercel 배포 시 secure 옵션은 자동으로 처리되는 경우가 많습니다.
+    // secure: process.env.NODE_ENV === 'production',
+  }
 }));
 
 app.use(express.json()); // 서버가 JSON 데이터를 이해하도록 설정
@@ -233,11 +246,8 @@ app.delete('/api/data', async (req, res) => {
     res.status(200).json({ message: 'All data deleted successfully.' });
 });
 
-// 서버 실행
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+module.exports = app;
 
-});
 
 
 
