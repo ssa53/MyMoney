@@ -892,3 +892,58 @@ body.dark-mode .stats-content {
 body.dark-mode .comparison-stat {
     color: #aaa;
 }
+
+/* --- 지출 내역 페이지 필터 및 목록 스타일 --- */
+.filter-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.filter-controls select,
+.filter-controls input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 0.95em;
+    outline: none;
+    flex-grow: 1; /* 가로로 늘어나게 */
+    max-width: 150px; /* 적당한 최대 너비 */
+}
+
+.filter-controls button {
+    /* 기존 버튼 스타일과 통일 */
+    background-color: #5c67f2;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.filter-controls button:hover {
+    background-color: #4a54c2;
+}
+
+.transaction-list-full {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 다크 모드 */
+body.dark-mode .filter-controls select,
+body.dark-mode .filter-controls input[type="date"] {
+    background-color: #33333d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+body.dark-mode .filter-controls button {
+    background-color: #7a83f5;
+}
+body.dark-mode .filter-controls button:hover {
+    background-color: #5c67f2;
+}

@@ -19,6 +19,7 @@
             <ul class="menu-list">
                 <li class="menu-item active" data-page="asset-management-page">자산 관리</li>
                 <li class="menu-item" data-page="statistics-page">통계 보기</li>
+                <li class="menu-item" data-page="transaction-history-page">지출 내역</li>
                 <li class="menu-item" data-page="settings-page">환경설정</li>
             </ul>
         </div>
@@ -95,7 +96,25 @@
                         </ul>
                     <button id="stats-back-btn">요약으로 돌아가기</button>
                 </div>
-
+            <div id="transaction-history-page" style="display: none;">
+                <h2>지출 내역</h2>
+                <div class="filter-controls">
+                    <select id="history-period-select">
+                        <option value="today">오늘</option>
+                        <option value="daily">일별</option>
+                        <option value="weekly">주별</option>
+                        <option value="monthly" selected>월별</option>
+                        <option value="yearly">년별</option>
+                        <option value="all">전체</option>
+                    </select>
+                    <input type="date" id="history-date-input" style="display: none;">
+                    <button id="history-filter-btn">조회</button>
+                </div>
+                <div id="filtered-transaction-empty-state" class="empty-state" style="display: none;">
+                    <p>해당 기간에 거래 내역이 없습니다.</p>
+                </div>
+                <ul id="filtered-transaction-list" class="transaction-list-full"></ul>
+            </div>
             <div id="settings-page" style="display: none;">
                 <h2>환경설정</h2>
                 <div class="settings-block">
