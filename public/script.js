@@ -55,28 +55,23 @@ let displayedMonth = new Date();
 function renderTransactionList(targetTransactions, targetListEl) {
     if (!targetListEl) return;
     targetListEl.innerHTML = '';
-
     if (!targetTransactions || targetTransactions.length === 0) {
         targetListEl.innerHTML = '<div class="empty-state" style="padding: 20px; margin-top: 0;"><p>해당 기간에 거래 내역이 없습니다.</p></div>';
         return;
-    } 
-    
+    }
     const grouped = targetTransactions.reduce((groups, t) => { (groups[t.date] = groups[t.date] || []).push(t); return groups; }, {});
     Object.keys(grouped).sort((a,b) => b.localeCompare(a)).forEach(date => {
         const dailyTotal = grouped[date].reduce((total, t) => t.type === 'expense' ? total - t.amount : total + t.amount, 0);
         let dailyStatus = '';
         if (dailyTotal > 0) dailyStatus = `수입: ${dailyTotal.toLocaleString()}원`;
         else if (dailyTotal < 0) dailyStatus = `지출: ${(-dailyTotal).toLocaleString()}원`;
-
         const groupHeader = document.createElement('div');
         groupHeader.classList.add('date-group-header');
         groupHeader.innerHTML = `<div class="date-header-left"><span class="toggle-icon"></span><span>${date}</span></div><span class="daily-expense">${dailyStatus}</span>`;
         targetListEl.appendChild(groupHeader);
-        
         const groupBody = document.createElement('ul');
         groupBody.classList.add('transaction-group-body');
         groupBody.style.display = 'none';
-
         grouped[date].forEach(transaction => {
             const listItem = document.createElement('li');
             listItem.classList.add(transaction.type);
@@ -110,11 +105,9 @@ function updateAllUI() {
     if (koreanBalanceEl) {
         koreanBalanceEl.innerHTML = formatToKoreanWon(finalBalance);
     }
-    
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(new Date().getDate() - 7);
     const recentTransactions = transactions.filter(t => new Date(t.date) >= oneWeekAgo);
-    
     if (listEl) {
         if (recentTransactions.length === 0) {
             listEl.style.display = 'none';
@@ -221,7 +214,6 @@ function applyDarkMode(isDark) {
 // 4. 데이터 로딩 및 초기화
 // ==================================
 async function loadAllData() {
-    if (!userInfo) return;
     if (loadingSpinner) loadingSpinner.style.display = 'flex';
     try {
         const userResponse = await axios.get('/user');
@@ -235,6 +227,7 @@ async function loadAllData() {
         assets = assetResponse.data;
         document.querySelector('.menu-item[data-page="asset-management-page"]').click();
     } catch (error) {
+        // 이 catch 블록은 로그인된 사용자의 세션이 만료되었을 때만 실행됩니다.
         console.error("세션 만료 또는 사용자 정보 로드 실패. 로그아웃합니다.", error);
         window.location.href = '/logout';
     } finally {
@@ -251,7 +244,10 @@ function initialize() {
             applyDarkMode(true);
         }
     }
-    loadAllData();
+    // 로그인 페이지가 아니라고 확신할 수 있을 때만 데이터 로딩
+    if (document.querySelector('.app-container')) {
+        loadAllData();
+    }
 }
 
 // ==================================

@@ -30,8 +30,9 @@ const assetSchema = new mongoose.Schema({
 });
 const Asset = mongoose.model('Asset', assetSchema);
 
+
 // --- MongoDB 연결 ---
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI; // Vercel 환경 변수 사용
 mongoose.connect(uri)
     .then(() => console.log('Connected to MongoDB Atlas!'))
     .catch(err => console.error('Could not connect to MongoDB Atlas...', err));
@@ -41,9 +42,9 @@ const app = express();
 app.set('trust proxy', 1);
 
 // --- 미들웨어 설정 ---
-app.use(nocache());
+app.use(nocache()); // 캐시 방지 미들웨어
 app.use(session({
-    secret: process.env.SECRET_COOKIE_PASSWORD,
+    secret: process.env.SECRET_COOKIE_PASSWORD, // Vercel 환경 변수 사용
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: uri }),
@@ -209,7 +210,7 @@ app.delete('/api/data', async (req, res) => {
     res.status(200).json({ message: 'All data deleted' });
 });
 
-// --- 페이지 라우팅 및 정적 파일 제공 ---
+// --- 페이지 라우팅 및 정적 파일 제공 (무한 새로고침 해결) ---
 app.get('/', (req, res) => {
     if (req.session && req.session.user) {
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
