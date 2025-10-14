@@ -34,10 +34,92 @@ const clearDataBtn = document.getElementById('clear-data-btn');
 let transactions = [];
 let assets = [];
 let currentUser = null;
+let assetChart = null;
 
 // ==================================
 // 3. 핵심 기능 함수
 // ==================================
+
+function renderAssetChart() {
+    const chartCanvas = document.getElementById('assetChart');
+    if (!chartCanvas) return;
+    const ctx = chartCanvas.getContext('2d');
+
+    // 기존 차트가 있으면 파괴
+    if (assetChart) {
+        assetChart.destroy();
+    }
+
+    const labels = assets.map(asset => asset.name);
+    const data = assets.map(asset => asset.amount);
+
+    assetChart = new Chart(ctx, {
+        type: 'doughnut', // 도넛 모양의 원형 그래프
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: [ // 색상은 원하시는 대로 추가/변경 가능
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                    '#9966FF', '#FF9F40'
+                ],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // 범례는 숨김
+                }
+            }
+        }
+    });
+
+    // 차트에 마우스 이벤트 추가
+    const detailsPopup = document.getElementById('asset-list-details');
+    chartCanvas.addEventListener('mouseenter', () => {
+        detailsPopup.innerHTML = assets.map(a => `<p><strong>${a.name}</strong>: ${a.amount.toLocaleString()}원</p>`).join('');
+        detailsPopup.style.display = 'block';
+    });
+    chartCanvas.addEventListener('mouseleave', () => {
+        detailsPopup.style.display = 'none';
+    });
+    // 모바일용 클릭 이벤트
+    chartCanvas.addEventListener('click', () => {
+        detailsPopup.innerHTML = assets.map(a => `<p><strong>${a.name}</strong>: ${a.amount.toLocaleString()}원</p>`).join('');
+        detailsPopup.style.display = detailsPopup.style.display === 'block' ? 'none' : 'block';
+    });
+}
+
+function formatToKoreanWon(number) {
+    if (number === 0) return '0 원';
+
+    const units = ['', '만', '억', '조'];
+    let result = '';
+    let unitIndex = 0;
+
+    while (number > 0) {
+        const part = number % 10000;
+        if (part > 0) {
+            const h = Math.floor(part / 1000);
+            const t = Math.floor((part % 1000) / 100);
+            const d = Math.floor((part % 100) / 10);
+            const o = part % 10;
+
+            let partStr = '';
+            if (h > 0) partStr += `<span>${h}</span>천 `;
+            if (t > 0) partStr += `<span>${t}</span>백 `;
+            if (d > 0) partStr += `<span>${d}</span>십 `;
+            if (o > 0) partStr += `<span>${o}</span>`;
+
+            result = `${partStr} ${units[unitIndex]} ${result}`;
+        }
+        number = Math.floor(number / 10000);
+        unitIndex++;
+    }
+    return result.trim() + ' 원';
+}
 
 // 로그인/로그아웃 상태에 따라 메뉴와 페이지 가시성 업데이트
 function updateUIVisibility(isLoggedIn) {
@@ -65,8 +147,6 @@ function updateUIVisibility(isLoggedIn) {
 function updateAllUI() {
     // ... (기존 updateAllUI 함수 내용은 동일)
     listEl.innerHTML = '';
-    assetListEl.innerHTML = '';
-    let totalBalance = assets.reduce((sum, asset) => sum + asset.amount, 0);
 
     assets.forEach(asset => {
         const assetItem = document.createElement('p');
@@ -122,7 +202,11 @@ function updateAllUI() {
 
     // 총 자산 계산: 초기 자산 합계 + 모든 거래 내역 합계
     const transactionTotal = transactions.reduce((sum, t) => t.type === 'income' ? sum + t.amount : sum - t.amount, 0);
-    balanceEl.innerText = (totalBalance + transactionTotal).toLocaleString();
+    const finalBalance = assets.reduce((sum, asset) => sum + asset.amount, 0);
+    const koreanBalanceEl = document.getElementById('total-balance-korean');
+    koreanBalanceEl.innerHTML = formatToKoreanWon(finalBalance);
+
+    renderAssetChart();
 }
 
 
@@ -188,7 +272,7 @@ async function loadAllData() {
         ]);
         transactions = transactionResponse.data;
         assets = assetResponse.data;
-
+        renderAssetChart();
     } catch (error) {
         userInfo.innerHTML = `<p>로그인이 필요합니다.</p><a href="/auth/kakao" class="kakao-login-btn">카카오톡으로 로그인</a>`; // '/api/auth/kakao' -> '/auth/kakao'
         updateUIVisibility(false);

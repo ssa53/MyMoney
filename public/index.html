@@ -6,6 +6,7 @@
     <title>간단 가계부</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -25,8 +26,9 @@
                 <div class="summary">
                     <h2>자산 현황</h2>
                     <div class="content-container">
-                        <p>총 자산: <span id="total-balance">0</span>원</p>
-                        <div id="asset-list"></div>
+                        <canvas id="assetChart"></canvas>
+                        <div id="asset-list-details" class="asset-list-popup">
+                            </div>
                     </div>
                     <form id="add-asset-form">
                         <input type="text" id="asset-name" placeholder="자산 이름 (ex. 주식, 예금)" required>

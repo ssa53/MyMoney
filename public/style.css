@@ -96,6 +96,41 @@ h1, h2, h3 {
     background-color: #f4f4f9;
 }
 
+.total-balance-display {
+    font-size: 1.8em; /* 글자 크기를 키움 */
+    font-weight: 300; /* 폰트를 약간 얇게 */
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.total-balance-display span {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 0 4px;
+}
+
+.chart-container {
+    position: relative; /* 팝업의 기준점이 됨 */
+    width: 200px; /* 원형 그래프의 크기 */
+    height: 200px;
+    margin: 0 auto 20px auto; /* 가운데 정렬 */
+}
+
+.asset-list-popup {
+    display: none; /* 평소에는 숨김 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: left;
+    width: 220px;
+    pointer-events: none; /* 마우스 이벤트 통과 */
+}
+
 /* ================================== */
 /* 4. 사이드바 내부 컴포넌트 */
 /* ================================== */
