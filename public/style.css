@@ -40,15 +40,32 @@ h1, h2, h3 {
 }
 
 .kakao-login-btn {
-    background-color: #FEE500;
-    color: #000000;
-    padding: 15px 30px;
+    display: inline-flex; /* 아이콘과 텍스트를 나란히 배치 */
+    align-items: center;
+    justify-content: center;
+    background-color: #FEE500; /* 카카오 노란색 */
+    color: #3C1E1E; /* 카카오 글씨 색상과 유사하게 */
+    padding: 0 20px;
+    height: 50px;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 1.1em;
     font-weight: bold;
+    text-decoration: none; /* a 태그의 밑줄 제거 */
     cursor: pointer;
     transition: background-color 0.2s ease;
+}
+
+.kakao-login-btn::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 22px;
+    margin-right: 10px;
+    background-image: url('https://developers.kakao.com/tool/resource/static/img/button/kakaotalk.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .kakao-login-btn:hover {

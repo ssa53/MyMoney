@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,36 +10,27 @@
 <body>
     <div class="app-container">
         <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>MENU</h2>
-            </div>
+            <div class="sidebar-header">MENU</div>
             <div id="user-info" class="user-info">
-                <p>로그인이 필요합니다.</p>
-                <button id="login-button">카카오톡으로 로그인</button>
-            </div>
+                </div>
             <ul class="menu-list">
-                <li class="menu-item active">자산 관리</li>
-                <li class="menu-item">통계 보기</li>
-                <li class="menu-item">환경설정</li>
+                <li class="menu-item active" data-page="asset-management-page">자산 관리</li>
+                <li class="menu-item" data-page="statistics-page">통계 보기</li>
+                <li class="menu-item" data-page="settings-page">환경설정</li>
             </ul>
         </div>
 
         <div class="main-content">
             <div id="asset-management-page">
                 <div class="summary">
-                    <div class="summary-header">
-                        <h2>자산 현황</h2>
-                    </div>
-                    
+                    <h2>자산 현황</h2>
                     <div class="content-container">
                         <p>총 자산: <span id="total-balance">0</span>원</p>
-                        <div id="asset-list">
-                            </div>
+                        <div id="asset-list"></div>
                     </div>
-
                     <form id="add-asset-form">
                         <input type="text" id="asset-name" placeholder="자산 이름 (ex. 주식, 예금)" required>
-                        <input type="number" id="asset-amount" placeholder="초기 금액" required>
+                        <input type="text" id="asset-amount" placeholder="초기 금액" inputmode="numeric" pattern="[0-9]*" required>
                         <button type="submit">자산 추가</button>
                     </form>
                 </div>
@@ -46,12 +39,12 @@
                     <h2>소득 / 지출 추가하기</h2>
                     <form id="transaction-form">
                         <input type="date" id="date" required>
-                        <input type="number" id="amount" placeholder="금액 (숫자)" required>
-                        <input type="text" id="description" placeholder="내역을 입력하세요 " lang="ko" inputmode="text" autocapitalize="none" autocorrect="off" autocomplete="off" required>
-                        <input type="text" id="beomju" name="beomju" placeholder="카테고리" lang="ko" inputmode="text" autocapitalize="none" autocorrect="off" autocomplete="off" required>
+                        <input type="text" id="amount" placeholder="금액 (숫자)" inputmode="numeric" pattern="[0-9]*" required>
+                        <input type="text" id="description" placeholder="내역을 입력하세요" lang="ko" inputmode="text" autocapitalize="none" autocorrect="off" autocomplete="off" required>
+                        <input type="text" id="beomju-input" name="beomju-input" placeholder="카테고리" lang="ko" inputmode="text" autocapitalize="none" autocorrect="off" autocomplete="off" required>
                         <select id="type">
-                            <option value="income">소득 (+)</option>
                             <option value="expense" selected>지출 (-)</option>
+                            <option value="income">소득 (+)</option>
                         </select>
                         <button type="submit">추가</button>
                     </form>
@@ -59,30 +52,29 @@
 
                 <div class="history">
                     <h2>거래 내역</h2>
-                <div id="transaction-list">
-                    </div>
+                    <ul id="transaction-list"></ul>
                 </div>
             </div>
 
-            <div id="statistics-page" class="hidden-page">
+            <div id="statistics-page" style="display: none;">
                 <h2>통계 보기</h2>
                 <div class="statistics-container">
-                    <div id="yearly-stats" class="stats-block">
+                    <div class="stats-block">
                         <h3>연도별 합계</h3>
                         <ul id="yearly-list"></ul>
                     </div>
-                    <div id="monthly-stats" class="stats-block">
+                    <div class="stats-block">
                         <h3>월별 합계</h3>
                         <ul id="monthly-list"></ul>
                     </div>
-                    <div id="daily-stats" class="stats-block">
+                    <div class="stats-block">
                         <h3>일별 합계</h3>
                         <ul id="daily-list"></ul>
                     </div>
                 </div>
             </div>
 
-            <div id="settings-page" class="hidden-page">
+            <div id="settings-page" style="display: none;">
                 <h2>환경설정</h2>
                 <div class="settings-block">
                     <h3>기능 설정</h3>
@@ -99,7 +91,6 @@
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </div>
     <script src="script.js"></script>
