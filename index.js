@@ -7,8 +7,6 @@ const session = require('express-session');
 const dbConnect = require('./lib/dbConnect');
 const MongoStore = require('connect-mongo');
 
-app.set('trust proxy', 1);
-
 // MongoDB 사용자 스키마 정의
 const userSchema = new mongoose.Schema({
     kakaoId: {
@@ -48,14 +46,10 @@ const Asset = mongoose.model('Asset', assetSchema);
 // MongoDB Connection String (여러분이 입력한 값)
 const uri = "mongodb+srv://sodoso532:Wognsdl12.@my-money-cluster.cg81boi.mongodb.net/?retryWrites=true&w=majority&appName=my-money-cluster"
 
-// MongoDB 연결
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('Connected to MongoDB Atlas!'))
-    .catch(err => console.error('Could not connect to MongoDB Atlas...', err));
-
 // express 앱 생성 및 설정
 const app = express();
 const port = 3000;
+app.set('trust proxy', 1);
 
 // =========================================================
 // 미들웨어 설정
