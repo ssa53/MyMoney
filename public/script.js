@@ -32,11 +32,13 @@ const statsTabs = document.querySelector('.stats-tabs');
 const categoryExpenseChartCanvas = document.getElementById('category-expense-chart');
 
 const transactionHistoryPage = document.getElementById('transaction-history-page');
-const historyPeriodSelect = document.getElementById('history-period-select');
-const historyDateInput = document.getElementById('history-date-input');
-const historyFilterBtn = document.getElementById('history-filter-btn');
-const filteredTransactionList = document.getElementById('filtered-transaction-list');
-const filteredTransactionEmptyState = document.getElementById('filtered-transaction-empty-state');
+const prevMonthBtn = document.getElementById('prev-month-btn');
+const nextMonthBtn = document.getElementById('next-month-btn');
+const currentMonthDisplay = document.getElementById('current-month-display');
+const calendarGrid = document.getElementById('calendar-grid');
+const calendarDetails = document.getElementById('calendar-details');
+const detailsTitle = document.getElementById('details-title');
+const detailsTransactionList = document.getElementById('details-transaction-list');
 
 const settingsPage = document.getElementById('settings-page');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -56,18 +58,14 @@ let displayedMonth = new Date();
 // 3. 핵심 기능 함수 (Rendering & Logic)
 // ==================================
 
-function renderTransactionList(targetTransactions, targetListEl, targetEmptyStateEl) {
+function renderTransactionList(targetTransactions, targetListEl) {
     if (!targetListEl) return;
     targetListEl.innerHTML = '';
 
     if (!targetTransactions || targetTransactions.length === 0) {
-        targetListEl.style.display = 'none';
-        if (targetEmptyStateEl) targetEmptyStateEl.style.display = 'block';
+        targetListEl.innerHTML = '<div class="empty-state"><p>해당 기간에 거래 내역이 없습니다.</p></div>';
         return;
     } 
-    
-    targetListEl.style.display = 'block';
-    if (targetEmptyStateEl) targetEmptyStateEl.style.display = 'none';
     
     const grouped = targetTransactions.reduce((groups, t) => {
         (groups[t.date] = groups[t.date] || []).push(t);
@@ -82,12 +80,7 @@ function renderTransactionList(targetTransactions, targetListEl, targetEmptyStat
 
         const groupHeader = document.createElement('div');
         groupHeader.classList.add('date-group-header');
-        groupHeader.innerHTML = `
-            <div class="date-header-left">
-                <span class="toggle-icon"></span>
-                <span>${date}</span>
-            </div>
-            <span class="daily-expense">${dailyStatus}</span>`;
+        groupHeader.innerHTML = `<div class="date-header-left"><span class="toggle-icon"></span><span>${date}</span></div><span class="daily-expense">${dailyStatus}</span>`;
         targetListEl.appendChild(groupHeader);
         
         const groupBody = document.createElement('ul');
@@ -139,23 +132,11 @@ function renderAssetChart() {
     const ctx = assetChartCanvas.getContext('2d');
     if (assetChart) assetChart.destroy();
     assetChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
+        type: 'doughnut', data: {
             labels: assets.map(a => a.name),
             datasets: [{ data: assets.map(a => a.amount), backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'] }]
         },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    enabled: true,
-                    callbacks: {
-                        label: (c) => `${c.label}: ${c.parsed.toLocaleString()}원`
-                    }
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: (c) => `${c.label}: ${c.parsed.toLocaleString()}원` }}}}
     });
 }
 
@@ -167,10 +148,7 @@ function formatToKoreanWon(number) {
         const part = number % 10000;
         if (part > 0) {
             let pStr = '', h = Math.floor(part / 1000), t = Math.floor((part % 1000) / 100), d = Math.floor((part % 100) / 10), o = part % 10;
-            if (h > 0) pStr += `<span>${h}</span>천 `;
-            if (t > 0) pStr += `<span>${t}</span>백 `;
-            if (d > 0) pStr += `<span>${d}</span>십 `;
-            if (o > 0) pStr += `<span>${o}</span>`;
+            if (h > 0) pStr += `<span>${h}</span>천 `; if (t > 0) pStr += `<span>${t}</span>백 `; if (d > 0) pStr += `<span>${d}</span>십 `; if (o > 0) pStr += `<span>${o}</span>`;
             result = `${pStr.trim()} ${units[unitIndex]} ${result}`;
         }
         number = Math.floor(number / 10000);
@@ -210,17 +188,29 @@ function renderStatistics(period) {
     }
 }
 
-function filterAndRenderHistory() {
+function renderCalendar(dateToShow) {
     if (!transactionHistoryPage) return;
-    const period = historyPeriodSelect.value;
-    const selectedDate = historyDateInput.value ? new Date(historyDateInput.value) : new Date();
-    let filtered = [];
-    if (period === 'all') { filtered = transactions; } 
-    else if (period === 'daily') { const dayStr = selectedDate.toISOString().split('T')[0]; filtered = transactions.filter(t => t.date === dayStr); } 
-    else if (period === 'weekly') { const startOfWeek = new Date(selectedDate); startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay()); const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6); filtered = transactions.filter(t => new Date(t.date) >= startOfWeek && new Date(t.date) <= endOfWeek); }
-    else if (period === 'monthly') { const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1); const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0); filtered = transactions.filter(t => new Date(t.date) >= startOfMonth && new Date(t.date) <= endOfMonth); }
-    else if (period === 'yearly') { const startOfYear = new Date(selectedDate.getFullYear(), 0, 1); const endOfYear = new Date(selectedDate.getFullYear(), 11, 31); filtered = transactions.filter(t => new Date(t.date) >= startOfYear && new Date(t.date) <= endOfYear); }
-    renderTransactionList(filtered, filteredTransactionList, filteredTransactionEmptyState);
+    currentMonthDisplay.textContent = `${dateToShow.getFullYear()}년 ${dateToShow.getMonth() + 1}월`;
+    calendarGrid.innerHTML = '';
+    if(calendarDetails) calendarDetails.style.display = 'none';
+    const year = dateToShow.getFullYear();
+    const month = dateToShow.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let i = 0; i < firstDay; i++) { calendarGrid.appendChild(document.createElement('div')); }
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        dayCell.dataset.date = dateStr;
+        const dailyExpenses = transactions.filter(t => t.date === dateStr && t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        let dailyTotalHtml = '';
+        if (dailyExpenses > 0) {
+            dailyTotalHtml = `<div class="daily-total">${dailyExpenses.toLocaleString()}</div>`;
+        }
+        dayCell.innerHTML = `<div class="day-number">${day}</div>${dailyTotalHtml}`;
+        calendarGrid.appendChild(dayCell);
+    }
 }
 
 function applyDarkMode(isDark) {
@@ -287,19 +277,15 @@ function setupEventListeners() {
                     if (pageId === 'statistics-page') {
                         renderStatistics('monthly');
                     } else if (pageId === 'transaction-history-page') {
-                        if (historyPeriodSelect) historyPeriodSelect.value = 'monthly';
-                        if (historyDateInput) {
-                            historyDateInput.valueAsDate = new Date();
-                            historyDateInput.style.display = 'none';
-                        }
-                        filterAndRenderHistory();
+                        displayedMonth = new Date();
+                        renderCalendar(displayedMonth);
                     }
                 }
             });
         });
     }
 
-    [listEl, filteredTransactionList].forEach(list => {
+    [listEl, detailsTransactionList].forEach(list => {
         if (list) {
             list.addEventListener('click', (event) => {
                 const header = event.target.closest('.date-group-header');
@@ -317,7 +303,7 @@ function setupEventListeners() {
                             transactions = transactions.filter(t => t._id !== transactionId);
                             const activePage = document.querySelector('.menu-item.active').dataset.page;
                             if (activePage === 'asset-management-page') updateAllUI();
-                            else if (activePage === 'transaction-history-page') filterAndRenderHistory();
+                            else if (activePage === 'transaction-history-page') renderCalendar(displayedMonth);
                         }).catch(err => { console.error(err); alert('삭제 중 오류 발생'); });
                     }
                 }
@@ -347,7 +333,7 @@ function setupEventListeners() {
                         }
                         const activePage = document.querySelector('.menu-item.active').dataset.page;
                         if (activePage === 'asset-management-page') updateAllUI();
-                        else if (activePage === 'transaction-history-page') filterAndRenderHistory();
+                        else if (activePage === 'transaction-history-page') renderCalendar(displayedMonth);
                     };
                     input.addEventListener('blur', saveUpdate);
                     input.addEventListener('keydown', (e) => {
@@ -355,7 +341,7 @@ function setupEventListeners() {
                         else if (e.key === 'Escape') {
                             const activePage = document.querySelector('.menu-item.active').dataset.page;
                             if (activePage === 'asset-management-page') updateAllUI();
-                            else if (activePage === 'transaction-history-page') filterAndRenderHistory();
+                            else if (activePage === 'transaction-history-page') renderCalendar(displayedMonth);
                         }
                     });
                 }
@@ -363,15 +349,21 @@ function setupEventListeners() {
         }
     });
 
-    if (historyPeriodSelect) {
-        historyPeriodSelect.addEventListener('change', () => {
-            if (historyDateInput) historyDateInput.style.display = (historyPeriodSelect.value === 'daily') ? 'block' : 'none';
+    if (prevMonthBtn) { prevMonthBtn.addEventListener('click', () => { displayedMonth.setMonth(displayedMonth.getMonth() - 1); renderCalendar(displayedMonth); }); }
+    if (nextMonthBtn) { nextMonthBtn.addEventListener('click', () => { displayedMonth.setMonth(displayedMonth.getMonth() + 1); renderCalendar(displayedMonth); }); }
+    if (calendarGrid) {
+        calendarGrid.addEventListener('click', (event) => {
+            const dayCell = event.target.closest('.calendar-day');
+            if (dayCell && dayCell.dataset.date) {
+                const date = dayCell.dataset.date;
+                const dailyTransactions = transactions.filter(t => t.date === date);
+                detailsTitle.textContent = `${date} 상세 내역`;
+                renderTransactionList(dailyTransactions, detailsTransactionList);
+                calendarDetails.style.display = 'block';
+            }
         });
     }
-    if (historyFilterBtn) {
-        historyFilterBtn.addEventListener('click', filterAndRenderHistory);
-    }
-    
+
     if (formEl) {
         formEl.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -379,7 +371,7 @@ function setupEventListeners() {
             const newTransaction = { date: dateEl.value, description: descriptionEl.value, amount: parseFloat(amountEl.value), category: categoryEl.value, type: typeEl.value };
             try {
                 const response = await axios.post('/api/transactions', newTransaction);
-                transactions.push(response.data);
+                transactions.unshift(response.data); // 최신 내역을 배열 맨 앞에 추가
                 updateAllUI();
                 formEl.reset();
                 if(dateEl) dateEl.valueAsDate = new Date();
@@ -482,7 +474,6 @@ function setupEventListeners() {
         });
     }
 }
-
 
 // ==================================
 // 6. 앱 시작

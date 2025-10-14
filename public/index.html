@@ -92,13 +92,25 @@
 
             <div id="transaction-history-page" style="display: none;">
                 <h2>지출 내역</h2>
+                
                 <div class="month-navigator">
-                    <button id="prev-month-btn">&lt;</button>
+                    <button id="prev-month-btn" class="button-secondary">&lt;</button>
                     <h3 id="current-month-display"></h3>
-                    <button id="next-month-btn">&gt;</button>
+                    <button id="next-month-btn" class="button-secondary">&gt;</button>
                 </div>
-                <div id="history-details-container">
+
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
                     </div>
+                    <div id="calendar-grid" class="calendar-grid">
+                        </div>
+                </div>
+
+                <div id="calendar-details" style="display: none;">
+                    <h3 id="details-title"></h3>
+                    <ul id="details-transaction-list" class="transaction-list-full"></ul>
+                </div>
             </div>
 
             <div id="settings-page" style="display: none;">
