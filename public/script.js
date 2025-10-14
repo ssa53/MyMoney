@@ -28,6 +28,11 @@ const userInfo = document.getElementById('user-info');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 const clearDataBtn = document.getElementById('clear-data-btn');
 
+const editAssetsBtn = document.getElementById('edit-assets-btn');
+const assetEditModal = document.getElementById('asset-edit-modal');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const modalAssetList = document.getElementById('modal-asset-list');
+
 // ==================================
 // 2. 상태(State) 변수 선언
 // ==================================
@@ -42,7 +47,7 @@ let assetChart = null; // ★★★ 차트 인스턴스를 저장할 변수 추�
 
 // ★★★ 자산 현황 원형 그래프를 그리는 함수 추가 ★★★
 function renderAssetChart() {
-    if (!assetManagementPage) return; // 자산 관리 페이지가 없으면 실행 안 함
+    if (!assetManagementPage) return;
 
     const chartCanvas = document.getElementById('assetChart');
     if (!chartCanvas) return;
@@ -67,26 +72,30 @@ function renderAssetChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            tooltip: {
-                enabled: false
+            plugins: {
+                legend: {
+                    display: false
+                },
+                // ★★★ 수정된 툴팁 설정 ★★★
+                tooltip: {
+                    enabled: true, // 기본 툴팁을 다시 활성화
+                    callbacks: {
+                        // 툴팁에 표시될 내용을 직접 정의
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed !== null) {
+                                label += context.parsed.toLocaleString() + '원';
+                            }
+                            return label;
+                        }
+                    }
+                }
             }
         }
     });
-
-    const detailsPopup = document.getElementById('asset-list-details');
-    if (detailsPopup) {
-        chartCanvas.onmouseenter = () => {
-            detailsPopup.innerHTML = assets.map(a => `<p><strong>${a.name}</strong>: ${a.amount.toLocaleString()}원</p>`).join('');
-            detailsPopup.style.display = 'block';
-        };
-        chartCanvas.onmouseleave = () => {
-            detailsPopup.style.display = 'none';
-        };
-        chartCanvas.onclick = () => {
-            detailsPopup.style.display = detailsPopup.style.display === 'block' ? 'none' : 'block';
-        };
-    }
 }
 
 // ★★★ 숫자를 한글 단위로 변환하는 함수 추가 ★★★
@@ -356,6 +365,69 @@ function setupEventListeners() {
             // ... 모든 데이터 삭제 로직 (기존과 동일)
         });
     }
+}
+
+// '자산 현황 수정' 버튼 클릭 시 팝업 열기
+if (editAssetsBtn) {
+    editAssetsBtn.addEventListener('click', () => {
+        // 현재 자산 목록으로 팝업 내용 채우기
+        modalAssetList.innerHTML = ''; // 기존 목록 초기화
+        assets.forEach(asset => {
+            const item = document.createElement('li');
+            item.classList.add('modal-asset-item');
+            item.dataset.id = asset._id;
+            item.innerHTML = `
+                <span>${asset.name}</span>
+                <input type="text" value="${asset.amount}" inputmode="numeric" pattern="[0-9]*">
+                <button class="delete-btn">삭제</button>
+            `;
+            modalAssetList.appendChild(item);
+        });
+        assetEditModal.style.display = 'flex';
+    });
+}
+
+// 팝업 '완료' 버튼 클릭 시 팝업 닫기
+if (modalCloseBtn) {
+    modalCloseBtn.addEventListener('click', () => {
+        assetEditModal.style.display = 'none';
+        // 변경사항을 즉시 반영하기 위해 UI 새로고침
+        updateAllUI(); 
+    });
+}
+
+// 팝업 내부에서 수정/삭제 이벤트 처리
+if (modalAssetList) {
+    modalAssetList.addEventListener('click', async (event) => {
+        if (event.target.classList.contains('delete-btn')) {
+            const item = event.target.closest('li');
+            const assetId = item.dataset.id;
+            if (confirm('이 자산을 정말 삭제하시겠습니까?')) {
+                try {
+                    await axios.delete(`/api/assets/${assetId}`);
+                    assets = assets.filter(a => a._id !== assetId);
+                    item.remove(); // 화면에서 바로 삭제
+                } catch (error) {
+                    alert('삭제 중 오류가 발생했습니다.');
+                }
+            }
+        }
+    });
+
+    modalAssetList.addEventListener('change', async (event) => {
+        if (event.target.tagName === 'INPUT') {
+            const item = event.target.closest('li');
+            const assetId = item.dataset.id;
+            const newAmount = parseFloat(event.target.value) || 0;
+            try {
+                await axios.put(`/api/assets/${assetId}`, { amount: newAmount });
+                const assetToUpdate = assets.find(a => a._id === assetId);
+                assetToUpdate.amount = newAmount;
+            } catch (error) {
+                alert('금액 수정 중 오류가 발생했습니다.');
+            }
+        }
+    });
 }
 
 // ==================================

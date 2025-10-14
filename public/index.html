@@ -24,13 +24,13 @@
             <div id="asset-management-page">
                 <div class="summary">
                     <h2>자산 현황</h2>
-                    
+                    <div id="total-balance-korean" class="total-balance-display"></div>
                     <div class="chart-container">
-                        <div id="total-balance-korean" class="total-balance-display"></div>
                         <canvas id="assetChart"></canvas>
                         <div id="asset-list-details" class="asset-list-popup"></div>
                     </div>
                     <form id="add-asset-form">
+                        <button type="button" id="edit-assets-btn" class="button-secondary">수정</button>
                         <input type="text" id="asset-name" placeholder="자산 이름 (ex. 주식, 예금)" required>
                         <input type="text" id="asset-amount" placeholder="초기 금액" inputmode="numeric" pattern="[0-9]*" required>
                         <button type="submit">자산 추가</button>
@@ -93,6 +93,13 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div id="asset-edit-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content post-it">
+            <h3>자산 수정 및 삭제</h3>
+            <ul id="modal-asset-list"></ul>
+        <button id="modal-close-btn">완료</button>
         </div>
     </div>
     <script src="script.js"></script>

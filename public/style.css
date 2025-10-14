@@ -75,6 +75,73 @@ h1, h2, h3 {
 /* ================================== */
 /* 3. 메인 앱 레이아웃 */
 /* ================================== */
+
+/* --- 자산 수정 버튼 및 팝업(모달) 스타일 --- */
+.button-secondary {
+    background-color: #f0f2f5;
+    color: #555;
+    font-weight: 500;
+}
+.button-secondary:hover {
+    background-color: #e2e2e7;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content.post-it {
+    background-color: #fffae1;
+    transform: rotate(-2deg); /* 포스트잇처럼 살짝 기울임 */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    text-align: center;
+}
+
+#modal-asset-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.modal-asset-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.modal-asset-item span {
+    flex-basis: 30%;
+}
+.modal-asset-item input {
+    flex-grow: 1;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 .app-container {
     display: flex;
     width: 100%;
@@ -97,30 +164,26 @@ h1, h2, h3 {
 }
 
 .total-balance-display {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 정중앙 배치 */
-    text-align: center;
-    font-size: 1em; /* 기본 글자 크기 조정 */
+    text-align: right;
+    font-size: 1.5em;
     font-weight: 300;
-    pointer-events: none; /* 텍스트 아래의 차트가 클릭/호버 되도록 함 */
-    width: 100%; /* 너비를 꽉 채워 줄바꿈이 자연스럽게 되도록 */
+    margin-bottom: 20px;
 }
 
+/* 숫자 부분 스타일 */
 .total-balance-display span {
-    font-weight: 600; /* 숫자 폰트 굵게 */
+    font-weight: 600;
     font-size: 1.2em;
     margin: 0 2px;
 }
 
-/* '원' 글씨 스타일 (강조) */
+/* '원' 글씨 스타일 */
 .total-balance-display .won-unit {
-    font-weight: 600;
-    font-size: 1.1em; /* '원' 글씨 크기 */
-    opacity: 0.9;
+    font-weight: 500;
+    font-size: 1em;
+    opacity: 0.8;
     margin-left: 5px;
-    color: #5c67f2; /* 테마 색상으로 강조 */
+    color: #5c67f2;
 }
 
 /* 다크 모드에서 '원' 글씨 강조 */
@@ -133,21 +196,6 @@ body.dark-mode .total-balance-display .won-unit {
     width: 200px; /* 원형 그래프의 크기 */
     height: 200px;
     margin: 0 auto 20px auto; /* 가운데 정렬 */
-}
-
-.asset-list-popup {
-    display: none; /* 평소에는 숨김 */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: left;
-    width: 220px;
-    pointer-events: none; /* 마우스 이벤트 통과 */
 }
 
 /* ================================== */
