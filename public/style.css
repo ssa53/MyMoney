@@ -568,10 +568,29 @@ body.dark-mode .stats-block li, body.dark-mode .setting-item { border-color: #33
         height: auto;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         border-right: none;
-        padding: 5px;
+        padding: 10px 15px; /* 좌우 여백 추가 */
+        display: flex; /* Flexbox 레이아웃으로 변경 */
+        flex-direction: row; /* 가로 방향 정렬 */
+        justify-content: space-between; /* 양쪽 끝으로 배치 */
+        align-items: center; /* 세로 중앙 정렬 */
     }
-    .user-info { display: none; } /* 모바일에서는 사용자 정보 숨김 */
-    .sidebar-header { display: none; }
+
+    /* 사용자 정보창 스타일 (모바일용) */
+    .user-info {
+        padding: 0;
+        margin: 0;
+        background-color: transparent;
+        box-shadow: none;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* 'MENU' 텍스트 숨김 */
+    .sidebar-header {
+        display: none;
+    }
     .menu-list {
         display: flex;
         justify-content: space-around;
