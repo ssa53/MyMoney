@@ -198,26 +198,57 @@ h2 {
 
 #transaction-form {
     display: flex;
-    justify-content: center; /* 폼 내부 요소들을 가운데로 정렬 */
+    gap: 15px; /* 요소 사이의 간격을 더 넓게 */
     align-items: center;
-    gap: 10px;
+    width: 100%;
+    padding: 20px;
+    background-color: #f7f7f9; /* 폼 배경에 미세한 색상 추가 */
+    border-radius: 12px; /* 폼 전체를 둥글게 */
+    box-sizing: border-box;
 }
 
-#transaction-form input, #transaction-form select, #transaction-form button {
-    padding: 7px;
-    border: 1px solid #a25555;
-    border-radius: 4px;
+/* 모든 입력창(input, select)의 기본 스타일 */
+#transaction-form input,
+#transaction-form select {
+    background-color: #FFFFFF;
+    border: 1px solid #e0e0e0; /* 연한 회색 테두리 */
+    border-radius: 8px; /* 둥근 모서리 */
+    padding: 12px 15px; /* 내부 여백을 늘려 큼직하게 */
+    font-size: 1em;
+    color: #333;
+    outline: none; /* 클릭 시 생기는 기본 테두리 제거 */
+    transition: all 0.2s ease-in-out; /* 부드러운 전환 효과 */
+    flex: 1; /* 모든 입력창이 균등하게 공간을 차지 */
 }
 
+/* 입력창 포커스(클릭) 시 효과 */
+#transaction-form input:focus,
+#transaction-form select:focus {
+    border-color: #5c67f2; /* 테마 색상으로 변경 */
+    box-shadow: 0 0 0 3px rgba(92, 103, 242, 0.2); /* 은은한 그림자 효과 */
+}
+
+/* 플레이스홀더(안내 문구) 스타일 */
+#transaction-form input::placeholder {
+    color: #a0a0a0;
+}
+
+/* '추가' 버튼 스타일 */
 #transaction-form button {
-    background-color: #7f83bd;
+    background-color: #5c67f2; /* 메인 테마 색상 */
     color: white;
+    font-weight: bold;
     border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0; /* 버튼 크기가 줄어들지 않도록 설정 */
 }
 
+/* 버튼에 마우스 올렸을 때 효과 */
 #transaction-form button:hover {
-    background-color: #515ad4;
+    background-color: #4a54c2;
 }
 
 #transaction-list {
@@ -470,6 +501,44 @@ body.dark-mode .category-label {
 
 body.dark-mode .editable-amount:hover {
     background-color: #2c2c2c;
+}
+
+/* ----- 다크 모드 스타일 ----- */
+body.dark-mode #transaction-form {
+    background-color: #25252d; /* 폼 배경 어둡게 */
+}
+
+body.dark-mode #transaction-form input,
+body.dark-mode #transaction-form select {
+    background-color: #33333d;
+    border-color: #444;
+    color: #f0f0f0;
+}
+
+body.dark-mode #transaction-form input::placeholder {
+    color: #888;
+}
+
+body.dark-mode #transaction-form input:focus,
+body.dark-mode #transaction-form select:focus {
+    border-color: #7a83f5;
+    box-shadow: 0 0 0 3px rgba(122, 131, 245, 0.25);
+}
+
+body.dark-mode #transaction-form button {
+    background-color: #7a83f5;
+}
+
+body.dark-mode #transaction-form button:hover {
+    background-color: #5c67f2;
+}
+
+/* ----- 모바일 반응형 대응 ----- */
+@media (max-width: 768px) {
+    #transaction-form {
+        flex-direction: column; /* 세로로 쌓기 */
+        align-items: stretch;
+    }
 }
 
 /* 로그인 페이지 스타일 */
