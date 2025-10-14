@@ -122,25 +122,9 @@ function formatToKoreanWon(number) {
 }
 
 // 로그인/로그아웃 상태에 따라 메뉴와 페이지 가시성 업데이트
-function updateUIVisibility(isLoggedIn) {
-    const pages = [assetManagementPage, statisticsPage, settingsPage];
-    const menuItemsToToggle = document.querySelectorAll('.menu-item[data-page="statistics-page"], .menu-item[data-page="settings-page"]');
-
-    // 모든 페이지 숨기기 및 메뉴 비활성화
-    pages.forEach(page => page.style.display = 'none');
-    menuItems.forEach(menu => menu.classList.remove('active'));
-
-    if (isLoggedIn) {
-        // 로그인 상태: 모든 메뉴 보이기 및 '자산 관리'를 기본으로 활성화
-        menuItemsToToggle.forEach(item => item.style.display = 'block');
-        assetManagementPage.style.display = 'block';
-        document.querySelector('.menu-item[data-page="asset-management-page"]').classList.add('active');
-    } else {
-        // 로그아웃 상태: 일부 메뉴 숨기기 및 '자산 관리'만 표시
-        menuItemsToToggle.forEach(item => item.style.display = 'none');
-        assetManagementPage.style.display = 'block';
-        document.querySelector('.menu-item[data-page="asset-management-page"]').classList.add('active');
-    }
+function updateUIVisibility() {
+    // 그냥 모든 메뉴를 보여주면 됩니다.
+    document.querySelectorAll('.menu-item').forEach(item => item.style.display = 'block');
 }
 
 // 모든 UI(자산, 거래내역, 총 자산)를 다시 그리는 함수
@@ -252,15 +236,13 @@ function applyDarkMode(isDark) {
 // ==================================
 
 // 페이지 로드 시 모든 데이터를 불러오는 메인 함수
-// 기존 loadAllData 함수를 지우고 아래 코드로 교체하세요.
 async function loadAllData() {
     try {
-        const userResponse = await axios.get('/api/user');
+        // 성공을 가정하고 사용자 정보와 데이터를 가져옵니다.
+        const userResponse = await axios.get('/user');
         currentUser = userResponse.data;
-        userInfo.innerHTML = `<p>안녕하세요, ${currentUser.nickname}님!</p><a href="/api/logout" id="logout-link">로그아웃</a>`;
+        userInfo.innerHTML = `<p>안녕하세요, ${currentUser.nickname}님!</p><a href="/logout" id="logout-link">로그아웃</a>`;
         
-        updateUIVisibility(true);
-
         const [transactionResponse, assetResponse] = await Promise.all([
             axios.get(`/api/transactions?userId=${currentUser.kakaoId}`),
             axios.get(`/api/assets?userId=${currentUser.kakaoId}`)
@@ -269,18 +251,16 @@ async function loadAllData() {
         assets = assetResponse.data;
 
     } catch (error) {
-        // ★★★ 이 부분이 누락되었습니다! ★★★
-        // 로그아웃 상태일 때, 로그인 버튼을 다시 그려줍니다.
-        userInfo.innerHTML = `
-            <p>로그인이 필요합니다.</p>
-            <a href="/auth/kakao" class="kakao-login-btn">카카오톡으로 로그인</a>
-        `;
-        updateUIVisibility(false);
-        transactions = [];
-        assets = [];
+        // 만약 여기서 에러가 발생하면 (예: 세션 만료),
+        // 더 이상 로그인 버튼을 그리지 않고 그냥 로그아웃 처리 후 로그인 페이지로 보냅니다.
+        console.error("세션이 만료되었거나 사용자를 불러올 수 없습니다. 로그아웃합니다.");
+        window.location.href = '/logout';
+        return; // 아래 updateAllUI 실행 방지
     }
-    // 데이터 로딩이 끝난 후, 성공하든 실패하든 항상 UI를 업데이트합니다.
+
+    // 성공했을 때만 전체 UI를 업데이트합니다.
     updateAllUI();
+    updateUIVisibility();
 }
 
 // 초기화 함수: 페이지가 처음 로드될 때 실행
