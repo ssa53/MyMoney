@@ -69,21 +69,30 @@
 
             <div id="statistics-page" style="display: none;">
                 <h2>통계 보기</h2>
-                <div class="statistics-container">
-                    <div class="stats-block">
-                        <h3>연도별 합계</h3>
-                        <ul id="yearly-list"></ul>
+                <div class="stats-summary-container">
+                    <div class="stats-card" data-period="yearly">
+                        <h3>올해</h3>
+                        <p class="income-stat">수입: <span id="yearly-income">0원</span></p>
+                        <p class="expense-stat">지출: <span id="yearly-expense">0원</span></p>
                     </div>
-                    <div class="stats-block">
-                        <h3>월별 합계</h3>
-                        <ul id="monthly-list"></ul>
+                    <div class="stats-card" data-period="monthly">
+                        <h3>이번 달</h3>
+                        <p class="income-stat">수입: <span id="monthly-income">0원</span></p>
+                        <p class="expense-stat">지출: <span id="monthly-expense">0원</span></p>
                     </div>
-                    <div class="stats-block">
-                        <h3>일별 합계</h3>
-                        <ul id="daily-list"></ul>
+                    <div class="stats-card" data-period="weekly">
+                        <h3>이번 주</h3>
+                        <p class="income-stat">수입: <span id="weekly-income">0원</span></p>
+                        <p class="expense-stat">지출: <span id="weekly-expense">0원</span></p>
                     </div>
                 </div>
-            </div>
+
+                <div id="stats-details-container" class="stats-details" style="display: none;">
+                    <h3 id="stats-details-title"></h3>
+                    <ul id="stats-details-list">
+                        </ul>
+                    <button id="stats-back-btn">요약으로 돌아가기</button>
+                </div>
 
             <div id="settings-page" style="display: none;">
                 <h2>환경설정</h2>

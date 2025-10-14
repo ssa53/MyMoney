@@ -244,7 +244,45 @@ function updateAllUI() {
 
 // 통계 페이지 UI 업데이트
 function updateStatisticsUI() {
-    // ... (기존과 동일)
+    const now = new Date();
+    
+    // 1. 기간별 거래 내역 필터링
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+    const weeklyTransactions = transactions.filter(t => new Date(t.date) >= startOfWeek);
+    const monthlyTransactions = transactions.filter(t => new Date(t.date) >= startOfMonth);
+    const yearlyTransactions = transactions.filter(t => new Date(t.date) >= startOfYear);
+
+    // 2. 총 수입/지출 계산 헬퍼 함수
+    const calculateTotals = (arr) => {
+        return arr.reduce((totals, t) => {
+            if (t.type === 'income') {
+                totals.income += t.amount;
+            } else {
+                totals.expense += t.amount;
+            }
+            return totals;
+        }, { income: 0, expense: 0 });
+    };
+
+    // 3. 각 카드에 데이터 업데이트
+    const yearlyTotals = calculateTotals(yearlyTransactions);
+    document.getElementById('yearly-income').innerText = yearlyTotals.income.toLocaleString() + '원';
+    document.getElementById('yearly-expense').innerText = yearlyTotals.expense.toLocaleString() + '원';
+
+    const monthlyTotals = calculateTotals(monthlyTransactions);
+    document.getElementById('monthly-income').innerText = monthlyTotals.income.toLocaleString() + '원';
+    document.getElementById('monthly-expense').innerText = monthlyTotals.expense.toLocaleString() + '원';
+
+    const weeklyTotals = calculateTotals(weeklyTransactions);
+    document.getElementById('weekly-income').innerText = weeklyTotals.income.toLocaleString() + '원';
+    document.getElementById('weekly-expense').innerText = weeklyTotals.expense.toLocaleString() + '원';
+
+    // 4. 상세 보기 숨기고, 요약 보기 보여주기 (초기 상태)
+    document.querySelector('.stats-summary-container').style.display = 'flex';
+    document.getElementById('stats-details-container').style.display = 'none';
 }
 
 // 다크 모드 적용/해제
@@ -303,6 +341,65 @@ function initialize() {
 // ==================================
 // 5. 이벤트 리스너(Event Listeners) - 한 곳으로 모아서 재배치
 // ==================================
+
+if (statisticsPage) {
+    statisticsPage.addEventListener('click', (event) => {
+        const card = event.target.closest('.stats-card');
+        const backBtn = event.target.closest('#stats-back-btn');
+
+        if (card) {
+            const period = card.dataset.period;
+            let title = '';
+            let targetTransactions = [];
+
+            const now = new Date();
+            if (period === 'yearly') {
+                title = `${now.getFullYear()}년 카테고리별 지출`;
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                targetTransactions = transactions.filter(t => new Date(t.date) >= startOfYear && t.type === 'expense');
+            } else if (period === 'monthly') {
+                title = `${now.getMonth() + 1}월 카테고리별 지출`;
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                targetTransactions = transactions.filter(t => new Date(t.date) >= startOfMonth && t.type === 'expense');
+            } else if (period === 'weekly') {
+                title = `이번 주 카테고리별 지출`;
+                const startOfWeek = new Date(new Date().setDate(new Date().getDate() - new Date().getDay()));
+                targetTransactions = transactions.filter(t => new Date(t.date) >= startOfWeek && t.type === 'expense');
+            }
+
+            const expensesByCategory = targetTransactions.reduce((map, t) => {
+                map[t.category] = (map[t.category] || 0) + t.amount;
+                return map;
+            }, {});
+
+            const detailsList = document.getElementById('stats-details-list');
+            detailsList.innerHTML = ''; // 목록 초기화
+
+            // 금액순으로 정렬
+            const sortedCategories = Object.entries(expensesByCategory).sort(([, a], [, b]) => b - a);
+            
+            if (sortedCategories.length === 0) {
+                 detailsList.innerHTML = '<li>해당 기간에 지출 내역이 없습니다.</li>';
+            } else {
+                sortedCategories.forEach(([category, amount]) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${category}</span> <strong>${amount.toLocaleString()}원</strong>`;
+                    detailsList.appendChild(li);
+                });
+            }
+
+            document.getElementById('stats-details-title').innerText = title;
+            document.querySelector('.stats-summary-container').style.display = 'none';
+            document.getElementById('stats-details-container').style.display = 'block';
+        }
+
+        if (backBtn) {
+            document.querySelector('.stats-summary-container').style.display = 'flex';
+            document.getElementById('stats-details-container').style.display = 'none';
+        }
+    });
+}
+
 function setupEventListeners() {
     if (menuItems) {
         menuItems.forEach(item => {
