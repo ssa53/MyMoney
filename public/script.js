@@ -197,7 +197,13 @@ function updateAllUI() {
 
             const groupHeader = document.createElement('div');
             groupHeader.classList.add('date-group-header');
-            groupHeader.innerHTML = `<span>${date}</span><span class="daily-expense">${dailyStatus}</span>`;
+            groupHeader.innerHTML = `
+                <div class="date-header-left">
+                    <span class="toggle-icon"></span>
+                    <span>${date}</span>
+                </div>
+                <span class="daily-expense">${dailyStatus}</span>
+            `;
             listEl.appendChild(groupHeader);
             
             const groupBody = document.createElement('ul');
