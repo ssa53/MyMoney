@@ -144,21 +144,14 @@ function updateUIVisibility(isLoggedIn) {
 }
 
 // 모든 UI(자산, 거래내역, 총 자산)를 다시 그리는 함수
+// 기존 updateAllUI 함수를 지우고 아래 코드로 교체하세요.
 function updateAllUI() {
-    // ... (기존 updateAllUI 함수 내용은 동일)
     listEl.innerHTML = '';
-
-    assets.forEach(asset => {
-        const assetItem = document.createElement('p');
-        assetItem.innerHTML = `<strong>${asset.name}</strong>: <span class="editable-amount" contenteditable="true" data-id="${asset._id}">${asset.amount.toLocaleString()}원</span>`;
-        assetListEl.appendChild(assetItem);
-    });
-
+    
+    // 1. 거래 내역 리스트 그리기
     const groupedTransactions = transactions.reduce((groups, transaction) => {
         const date = transaction.date;
-        if (!groups[date]) {
-            groups[date] = [];
-        }
+        if (!groups[date]) groups[date] = [];
         groups[date].push(transaction);
         return groups;
     }, {});
@@ -173,12 +166,11 @@ function updateAllUI() {
         const groupHeader = document.createElement('div');
         groupHeader.classList.add('date-group-header');
         groupHeader.innerHTML = `<span>${date}</span> <span class="daily-expense">${dailyStatus}</span>`;
-        groupHeader.setAttribute('data-date', date);
         listEl.appendChild(groupHeader);
         
         const groupBody = document.createElement('ul');
         groupBody.classList.add('transaction-group-body');
-        groupBody.style.display = 'none'; // 기본적으로 닫힘
+        groupBody.style.display = 'none';
 
         groupedTransactions[date].forEach(transaction => {
             const listItem = document.createElement('li');
@@ -200,12 +192,14 @@ function updateAllUI() {
         listEl.appendChild(groupBody);
     });
 
-    // 총 자산 계산: 초기 자산 합계 + 모든 거래 내역 합계
-    const transactionTotal = transactions.reduce((sum, t) => t.type === 'income' ? sum + t.amount : sum - t.amount, 0);
+    // 2. 총 자산 (한글 포맷) 계산 및 표시
     const finalBalance = assets.reduce((sum, asset) => sum + asset.amount, 0);
     const koreanBalanceEl = document.getElementById('total-balance-korean');
-    koreanBalanceEl.innerHTML = formatToKoreanWon(finalBalance);
-
+    if (koreanBalanceEl) {
+        koreanBalanceEl.innerHTML = formatToKoreanWon(finalBalance);
+    }
+    
+    // 3. 자산 현황 원형 그래프 그리기
     renderAssetChart();
 }
 
@@ -258,11 +252,12 @@ function applyDarkMode(isDark) {
 // ==================================
 
 // 페이지 로드 시 모든 데이터를 불러오는 메인 함수
+// 기존 loadAllData 함수를 지우고 아래 코드로 교체하세요.
 async function loadAllData() {
     try {
-        const userResponse = await axios.get('/user'); // '/api/user' -> '/user'
+        const userResponse = await axios.get('/api/user');
         currentUser = userResponse.data;
-        userInfo.innerHTML = `<p>안녕하세요, ${currentUser.nickname}님!</p><a href="/logout" id="logout-link">로그아웃</a>`; // '/api/logout' -> '/logout'
+        userInfo.innerHTML = `<p>안녕하세요, ${currentUser.nickname}님!</p><a href="/api/logout" id="logout-link">로그아웃</a>`;
         
         updateUIVisibility(true);
 
@@ -272,13 +267,19 @@ async function loadAllData() {
         ]);
         transactions = transactionResponse.data;
         assets = assetResponse.data;
-        renderAssetChart();
+
     } catch (error) {
-        userInfo.innerHTML = `<p>로그인이 필요합니다.</p><a href="/auth/kakao" class="kakao-login-btn">카카오톡으로 로그인</a>`; // '/api/auth/kakao' -> '/auth/kakao'
+        // ★★★ 이 부분이 누락되었습니다! ★★★
+        // 로그아웃 상태일 때, 로그인 버튼을 다시 그려줍니다.
+        userInfo.innerHTML = `
+            <p>로그인이 필요합니다.</p>
+            <a href="/auth/kakao" class="kakao-login-btn">카카오톡으로 로그인</a>
+        `;
         updateUIVisibility(false);
         transactions = [];
         assets = [];
     }
+    // 데이터 로딩이 끝난 후, 성공하든 실패하든 항상 UI를 업데이트합니다.
     updateAllUI();
 }
 
