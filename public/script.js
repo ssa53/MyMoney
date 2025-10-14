@@ -106,11 +106,12 @@ function updateAllUI() {
             listItem.setAttribute('data-id', transaction._id);
             listItem.innerHTML = `
                 <div>
-                    <span class="transaction-description">${transaction.description}</span>
-                    <span class="category-label">${transaction.category}</span>
+                    <span class="transaction-description editable" data-field="description">${transaction.description}</span>
+                    <span class="category-label editable" data-field="category">${transaction.category}</span>
                 </div>
                 <div class="transaction-amount-container">
-                    <span class="transaction-amount">${(transaction.type === 'income' ? '+' : '-') + transaction.amount.toLocaleString()}원</span>
+                    <span class="transaction-amount editable" data-field="amount">${transaction.amount.toLocaleString()}</span>
+                    <span style="color: ${transaction.type === 'expense' ? '#dc3545' : '#28a745'}; font-weight: bold;">원</span>
                     <button class="delete-btn">삭제</button>
                 </div>
             `;
@@ -359,6 +360,67 @@ clearDataBtn.addEventListener('click', async () => {
             alert("데이터 삭제 중 오류가 발생했습니다.");
         }
     }
+});
+
+// 거래 내역 아이템 클릭 시 수정 모드로 변경
+listEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!target.classList.contains('editable') || target.querySelector('input')) {
+        return; // 수정 가능한 요소가 아니거나, 이미 수정 중이면 무시
+    }
+
+    const listItem = target.closest('li');
+    const transactionId = listItem.dataset.id;
+    const field = target.dataset.field;
+    const currentValue = transactions.find(t => t._id === transactionId)[field];
+
+    // 입력창 생성
+    const input = document.createElement('input');
+    input.type = (field === 'amount') ? 'text' : 'text';
+    if (field === 'amount') {
+        input.inputMode = 'numeric';
+        input.pattern = '[0-9]*';
+    }
+    input.value = currentValue;
+    input.style.width = `${target.offsetWidth + 20}px`; // 원래 너비보다 약간 넓게
+
+    // 원래 텍스트를 입력창으로 교체
+    target.innerHTML = '';
+    target.appendChild(input);
+    input.focus();
+
+    // 입력창에서 포커스가 벗어나거나 Enter 키를 누르면 저장
+    const saveUpdate = async () => {
+        const newValue = (field === 'amount') ? parseFloat(input.value) || 0 : input.value;
+        
+        // 값이 변경되었을 때만 서버에 요청
+        if (newValue !== currentValue) {
+            try {
+                // 서버에 업데이트 요청
+                await axios.put(`/api/transactions/${transactionId}`, { [field]: newValue });
+                
+                // 프론트엔드 데이터 업데이트
+                const transactionToUpdate = transactions.find(t => t._id === transactionId);
+                transactionToUpdate[field] = newValue;
+
+            } catch (error) {
+                console.error('Error updating transaction:', error);
+                alert('업데이트 중 오류가 발생했습니다.');
+            }
+        }
+        // 전체 UI를 다시 그려서 원래대로 복구 및 최신 상태 반영
+        updateAllUI();
+    };
+
+    input.addEventListener('blur', saveUpdate);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            saveUpdate();
+        } else if (e.key === 'Escape') {
+            // Esc 키를 누르면 취소하고 UI만 다시 그림
+            updateAllUI();
+        }
+    });
 });
 
 // ==================================

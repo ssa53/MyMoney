@@ -298,14 +298,18 @@ body.dark-mode #transaction-form button:hover {
 }
 
 #transaction-list li {
-    background-color: transparent;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 15px; /* 상하 패딩을 줄여 높이를 낮춤 */
+    margin-bottom: 8px;
     border: 1px solid #eee;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+#transaction-list li:hover {
+    background-color: #f9f9fb; /* 마우스를 올렸을 때 배경색 변경 */
 }
 
 #transaction-list li > div {
@@ -349,6 +353,25 @@ body.dark-mode #transaction-form button:hover {
     font-size: 0.8em;
 }
 .delete-btn:hover { background-color: #c0392b; }
+
+.editable {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 4px;
+    transition: background-color 0.2s ease;
+}
+
+.editable:hover {
+    background-color: #e0e0e0;
+}
+
+body.dark-mode .editable:hover {
+    background-color: #444;
+}
+
+body.dark-mode #transaction-list li:hover {
+    background-color: #2a2a30;
+}
 
 /* ================================== */
 /* 8. 기타 페이지 (통계, 설정) */

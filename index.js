@@ -235,6 +235,29 @@ app.delete('/api/assets/:id', async (req, res) => {
     res.status(200).json({ message: 'Asset deleted.' });
 });
 
+app.put('/api/transactions/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const userId = req.session.user.kakaoId;
+    const transactionId = req.params.id;
+    
+    try {
+        const updatedTransaction = await Transaction.findOneAndUpdate(
+            { _id: transactionId, userId: userId }, // 조건
+            { $set: req.body }, // 업데이트할 내용 (예: { description: '새로운 내용' })
+            { new: true } // 업데이트된 문서를 반환
+        );
+        if (!updatedTransaction) {
+            return res.status(404).json({ error: 'Transaction not found' });
+        }
+        res.status(200).json(updatedTransaction);
+    } catch (error) {
+        console.error('Error updating transaction:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 app.delete('/api/data', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
