@@ -1,12 +1,10 @@
 // ==================================
 // 1. 요소(Element) 변수 선언
 // ==================================
-// 공통 요소
 const userInfo = document.getElementById('user-info');
 const loadingSpinner = document.getElementById('loading-spinner');
 const menuItems = document.querySelectorAll('.menu-item');
 
-// 자산 관리 페이지 요소
 const assetManagementPage = document.getElementById('asset-management-page');
 const koreanBalanceEl = document.getElementById('total-balance-korean');
 const chartContainer = document.querySelector('.chart-container');
@@ -24,18 +22,15 @@ const typeEl = document.getElementById('type');
 const transactionEmptyState = document.getElementById('transaction-empty-state');
 const listEl = document.getElementById('transaction-list');
 
-// 자산 수정 팝업 요소
 const editAssetsBtn = document.getElementById('edit-assets-btn');
 const assetEditModal = document.getElementById('asset-edit-modal');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const modalAssetList = document.getElementById('modal-asset-list');
 
-// 통계 보기 페이지 요소
 const statisticsPage = document.getElementById('statistics-page');
 const statsTabs = document.querySelector('.stats-tabs');
 const categoryExpenseChartCanvas = document.getElementById('category-expense-chart');
 
-// 지출 내역 페이지 요소
 const transactionHistoryPage = document.getElementById('transaction-history-page');
 const prevMonthBtn = document.getElementById('prev-month-btn');
 const nextMonthBtn = document.getElementById('next-month-btn');
@@ -45,7 +40,6 @@ const calendarDetails = document.getElementById('calendar-details');
 const detailsTitle = document.getElementById('details-title');
 const detailsTransactionList = document.getElementById('details-transaction-list');
 
-// 환경설정 페이지 요소
 const settingsPage = document.getElementById('settings-page');
 const darkModeToggle = document.getElementById('dark-mode-toggle');
 const clearDataBtn = document.getElementById('clear-data-btn');
@@ -64,12 +58,12 @@ let displayedMonth = new Date();
 // 3. 핵심 기능 함수 (Rendering & Logic)
 // ==================================
 
-function renderTransactionList(targetTransactions, targetListEl) {
+function renderTransactionList(targetTransactions, targetListEl, emptyStateMessage) {
     if (!targetListEl) return;
     targetListEl.innerHTML = '';
 
     if (!targetTransactions || targetTransactions.length === 0) {
-        targetListEl.innerHTML = '<div class="empty-state" style="padding: 20px; margin-top: 0;"><p>해당 기간에 거래 내역이 없습니다.</p></div>';
+        targetListEl.innerHTML = `<div class="empty-state" style="padding: 20px; margin-top: 0;"><p>${emptyStateMessage}</p></div>`;
         return;
     } 
     
@@ -178,21 +172,9 @@ function renderStatistics(period) {
     document.querySelectorAll('.stats-tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.period === period));
     const now = new Date();
     let currentPeriodStart, previousPeriodStart, previousPeriodEnd;
-
-    if (period === 'weekly') { 
-        const sunday = new Date(); 
-        sunday.setDate(now.getDate() - now.getDay());
-        currentPeriodStart = sunday; 
-        previousPeriodStart = new Date(new Date().setDate(sunday.getDate() - 7)); 
-        previousPeriodEnd = new Date(new Date().setDate(now.getDate() - 7)); 
-    } else if (period === 'monthly') { 
-        currentPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1); 
-        previousPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); 
-        previousPeriodEnd = new Date(new Date().setMonth(now.getMonth() - 1)); 
-    } else { 
-        currentPeriodStart = new Date(now.getFullYear(), 0, 1); 
-    }
-
+    if (period === 'weekly') { const sunday = new Date(now); sunday.setDate(now.getDate() - now.getDay()); currentPeriodStart = sunday; previousPeriodStart = new Date(sunday); previousPeriodStart.setDate(sunday.getDate() - 7); previousPeriodEnd = new Date(now); previousPeriodEnd.setDate(now.getDate() - 7); } 
+    else if (period === 'monthly') { currentPeriodStart = new Date(now.getFullYear(), now.getMonth(), 1); previousPeriodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); previousPeriodEnd = new Date(now); previousPeriodEnd.setMonth(now.getMonth() - 1); } 
+    else { currentPeriodStart = new Date(now.getFullYear(), 0, 1); }
     const currentTransactions = transactions.filter(t => new Date(t.date) >= currentPeriodStart);
     let previousTransactions = []; if (period !== 'yearly') { previousTransactions = transactions.filter(t => new Date(t.date) >= previousPeriodStart && new Date(t.date) <= previousPeriodEnd); }
     const currentTotals = currentTransactions.reduce((acc, t) => { acc[t.type] = (acc[t.type] || 0) + t.amount; return acc; }, { income: 0, expense: 0 });
@@ -488,6 +470,8 @@ function setupEventListeners() {
                     transactions = [];
                     assets = [];
                     updateAllUI();
+                    renderCalendar(displayedMonth);
+                    renderStatistics('monthly');
                 } catch (error) { alert("데이터 삭제 중 오류가 발생했습니다."); }
             }
         });
