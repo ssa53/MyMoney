@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     kakaoId: { type: String, required: true, unique: true },
     nickname: { type: String, required: true },
 });
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 const transactionSchema = new mongoose.Schema({
     userId: { type: String, required: true },
@@ -21,14 +21,14 @@ const transactionSchema = new mongoose.Schema({
     category: { type: String, required: true },
     type: { type: String, required: true }
 });
-const Transaction = mongoose.model('Transaction', transactionSchema);
+const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
 
 const assetSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     name: { type: String, required: true },
     amount: { type: Number, required: true }
 });
-const Asset = mongoose.model('Asset', assetSchema);
+const Asset = mongoose.models.Asset || mongoose.model('Asset', assetSchema);
 
 
 // --- MongoDB 연결 ---
