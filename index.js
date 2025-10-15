@@ -210,19 +210,21 @@ app.delete('/api/data', async (req, res) => {
     res.status(200).json({ message: 'All data deleted' });
 });
 
-// --- 페이지 라우팅 및 정적 파일 제공 (무한 새로고침 해결) ---
-app.get('/', (req, res) => {
+// --- 페이지 라우팅 및 정적 파일 제공 ---
+
+// 'public' 폴더의 정적 파일(css, js, images 등)을 먼저 제공하도록 설정합니다.
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API 라우트들은 이 코드 블록 이전에 정의되어 있으므로 먼저 처리됩니다.
+// 그 후, 위에서 처리되지 않은 모든 GET 요청은 여기서 최종적으로 처리합니다.
+// (SPA에서 새로고침 시 404 오류 방지 및 기본 페이지 로딩 역할)
+app.get('*', (req, res) => {
+    // 사용자가 로그인한 상태이면 메인 앱(index.html)을, 아니면 로그인 페이지를 보여줍니다.
     if (req.session && req.session.user) {
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
     } else {
         res.sendFile(path.join(__dirname, 'public', 'login.html'));
     }
-});
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('*', (req, res) => {
-    res.redirect('/');
 });
 
 module.exports = app;
