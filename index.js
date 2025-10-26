@@ -6,6 +6,11 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const nocache = require('nocache');
 
+app.use(cors({
+  origin: 'http://127.0.0.1:5500', // 로컬 개발 환경 주소 허용
+  credentials: true // 쿠키(자격 증명) 허용
+}));
+
 // --- 스키마 정의 ---
 const userSchema = new mongoose.Schema({
     kakaoId: { type: String, required: true, unique: true },
@@ -49,10 +54,12 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: uri }),
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-        secure: true,
         httpOnly: true,
-    }
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        sameSite: 'lax'
+    },
+    proxy: true
 }));
 app.use(express.json());
 
