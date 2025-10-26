@@ -59,6 +59,7 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
         sameSite: 'none'
+        //주석 추가
     },
     proxy: true
 }));
