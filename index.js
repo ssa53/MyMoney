@@ -34,10 +34,16 @@ const Asset = mongoose.models.Asset || mongoose.model('Asset', assetSchema);
 
 // --- MongoDB 연결 ---
 const uri = process.env.MONGODB_URI; // Vercel 환경 변수 사용
-mongoose.connect(uri)
-    .then(() => console.log('Connected to MongoDB Atlas!'))
-    .catch(err => console.error('Could not connect to MongoDB Atlas...', err));
-
+const connectionPromise = mongoose.connect(uri)
+    .then(m => {
+        console.log('Connected to MongoDB Atlas!');
+        // 연결된 Mongoose 인스턴스의 클라이언트(MongoClient)를 반환합니다.
+        return m.connection.getClient(); // 이 부분이 중요합니다.
+    })
+    .catch(err => {
+        console.error('Could not connect to MongoDB Atlas...', err);
+        process.exit(1);
+    });
 // --- Express 앱 설정 ---
 const app = express();
 app.set('trust proxy', 1);
@@ -53,7 +59,10 @@ app.use(session({
     secret: process.env.SECRET_COOKIE_PASSWORD, // Vercel 환경 변수 사용
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: uri }),
+    store: MongoStore.create({
+            clientPromise: connectionPromise, // Mongoose 연결 Promise 전달
+            // mongoUrl: uri, // 이 줄은 주석 처리하거나 삭제
+        }),
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -242,6 +251,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 module.exports = app;
+
 
 
 
