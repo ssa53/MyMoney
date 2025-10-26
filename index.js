@@ -218,17 +218,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API 라우트들은 이 코드 블록 이전에 정의되어 있으므로 먼저 처리됩니다.
 // 그 후, 위에서 처리되지 않은 모든 GET 요청은 여기서 최종적으로 처리합니다.
 // (SPA에서 새로고침 시 404 오류 방지 및 기본 페이지 로딩 역할)
-app.get('*', (req, res) => {
-    // 사용자가 로그인한 상태이면 메인 앱(index.html)을, 아니면 로그인 페이지를 보여줍니다.
-    if (req.session && req.session.user) {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    } else {
-        res.sendFile(path.join(__dirname, 'public', 'login.html'));
-    }
-    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//     // 사용자가 로그인한 상태이면 메인 앱(index.html)을, 아니면 로그인 페이지를 보여줍니다.
+//     if (req.session && req.session.user) {
+//         res.sendFile(path.join(__dirname, 'public', 'index.html'));
+//     } else {
+//         res.sendFile(path.join(__dirname, 'public', 'login.html'));
+//     }
+//     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+// });
 
 
 module.exports = app;
+
 
 
