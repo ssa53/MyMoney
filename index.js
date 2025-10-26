@@ -124,14 +124,7 @@ app.get('/auth/kakao/callback', async (req, res) => {
         }
         req.session.user = user;
         console.log('User logged in, attempting to save session:', req.session);
-        req.session.save(err => {
-                    if (err) {
-                        console.error('Session save error:', err);
-                        return res.status(500).send('세션 저장 중 오류 발생');
-                    }
-                    console.log('Session saved successfully, redirecting to /');
-                    res.redirect('/');
-                });
+        res.redirect('/');
     } catch (error) {
         console.error('카카오 로그인 오류:', error.response?.data || error.message);
         res.status(500).send('카카오 로그인 중 오류가 발생했습니다.');
