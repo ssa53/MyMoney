@@ -5,11 +5,7 @@ const axios = require('axios');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const nocache = require('nocache');
-
-app.use(cors({
-  origin: 'http://127.0.0.1:5500', // 로컬 개발 환경 주소 허용
-  credentials: true // 쿠키(자격 증명) 허용
-}));
+const cors = require('cors');
 
 // --- 스키마 정의 ---
 const userSchema = new mongoose.Schema({
@@ -45,6 +41,11 @@ mongoose.connect(uri)
 // --- Express 앱 설정 ---
 const app = express();
 app.set('trust proxy', 1);
+
+app.use(cors({
+  origin: 'http://127.0.0.1:5500', // 로컬 개발 환경 주소 허용
+  credentials: true // 쿠키(자격 증명) 허용
+}));
 
 // --- 미들웨어 설정 ---
 app.use(nocache()); // 캐시 방지 미들웨어
