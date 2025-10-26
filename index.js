@@ -43,7 +43,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use(cors({
-  origin: 'http://127.0.0.1:5500', // 로컬 개발 환경 주소 허용
+  origin: 'http://localhost:3000', // 로컬 개발 환경 주소 허용
   credentials: true // 쿠키(자격 증명) 허용
 }));
 
